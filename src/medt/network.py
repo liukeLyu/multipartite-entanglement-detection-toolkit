@@ -162,23 +162,97 @@ def _solve(t: cp.Variable, cons: list, solver: str | None, solver_kwargs: dict) 
     return float(t.value)
 
 
+def _local_charges(d: int) -> np.ndarray:
+    """Charge of each local basis state: the number of excitations for qubit clusters, else the level."""
+    if d & (d - 1) == 0:
+        return np.array([bin(j).count("1") for j in range(d)])
+    return np.arange(d)
+
+
+def _total_charge(dims: Sequence[int], signs: Sequence[int] | None = None) -> np.ndarray:
+    """Total charge of each product basis state, with party ``k`` weighted by ``signs[k]``."""
+    signs = [1] * len(dims) if signs is None else signs
+    q = np.zeros(1, dtype=int)
+    for d, sgn in zip(dims, signs, strict=True):
+        q = (q[:, None] + sgn * _local_charges(d)[None, :]).ravel()
+    return q
+
+
+def _symmetry(rho: np.ndarray, dims3: Sequence[int]) -> int | None:
+    """Modulus of a charge conserved by ``rho``: 0 for U(1), 2 for parity, ``None`` if neither."""
+    q = _total_charge(dims3)
+    off = np.abs(rho) > 1e-12
+    if not np.any(off & (q[:, None] != q[None, :])):
+        return 0
+    if not np.any(off & ((q[:, None] - q[None, :]) % 2 != 0)):
+        return 2
+    return None
+
+
 def _level3_robustness(rho: np.ndarray, dims3: list[int], solver: str | None, solver_kwargs: dict) -> float:
     """Level-3 inflation SDP of Lyu et al. [2], Supplemental Material Eq. (A5).
 
     Parties are ordered ``A1 B1 C1 A2 B2 C2 A3 B3 C3`` (0-based indices 0-8).
     ``sigma`` holds three disjoint triangles, ``tau`` a 6-ring and a triangle,
     and ``gamma`` the 9-ring.
+
+    If ``rho`` conserves the number of excitations (U(1), as for W and Dicke
+    states) or its parity (as for GHZ states), the inflated states can be
+    twirled by the same symmetry on every party without violating any
+    constraint. They are then block diagonal in the total charge, and every
+    PSD constraint splits into blocks, which shrinks the SDP several-fold.
     """
     D3 = int(np.prod(dims3))
+    D9 = D3**3
     dims9 = dims3 * 3
     copies = [D3] * 3
     real = bool(np.allclose(rho.imag, 0))
     rho = rho.real if real else rho
+    mod = _symmetry(rho, dims3)
+
+    def reduce(q):
+        return q if mod in (0, None) else q % mod
+
+    def sectors(q):
+        """Index sets of equal charge; one block when there is no symmetry."""
+        if mod is None:
+            return [np.arange(q.size)]
+        q = reduce(q)
+        return [np.flatnonzero(q == c) for c in np.unique(q)]
+
+    def support(q):
+        """Flat indices of the entries allowed to be nonzero by charge conservation."""
+        if mod is None:
+            return np.arange(q.size**2)
+        q = reduce(q)
+        return np.flatnonzero((q[:, None] == q[None, :]).ravel())
+
+    def block(expr, idx, n):
+        flat = (idx[:, None] * n + idx[None, :]).ravel()
+        return cp.reshape(cp.vec(expr, order="C")[flat], (idx.size, idx.size), order="C")
+
+    def psd(expr, q):
+        return [block(expr, idx, q.size) >> 0 for idx in sectors(q)]
+
+    def eq(A, B, q):
+        idx = support(q)
+        return cp.vec(A, order="C")[idx] == cp.vec(B, order="C")[idx]
+
+    q9 = _total_charge(dims9)
 
     def state():
-        X = cp.Variable((D3**3,) * 2, symmetric=True) if real else cp.Variable((D3**3,) * 2, hermitian=True)
-        tr = cp.trace(X) if real else cp.real(cp.trace(X))
-        return X, [X >> 0, tr == 1]
+        parts, cons, tr = [], [], 0
+        for idx in sectors(q9):
+            n = idx.size
+            Y = cp.Variable((n, n), symmetric=True) if real else cp.Variable((n, n), hermitian=True)
+            rows = (idx[:, None] * D9 + idx[None, :]).ravel()
+            S = sparse.csr_matrix((np.ones(n * n), (rows, np.arange(n * n))), shape=(D9 * D9, n * n))
+            parts.append(S @ cp.vec(Y, order="C"))
+            cons.append(Y >> 0)
+            tr = tr + cp.trace(Y)
+        X = cp.reshape(cp.sum(parts) if len(parts) > 1 else parts[0], (D9, D9), order="C")
+        cons.append((tr if real else cp.real(tr)) == 1)
+        return X, cons
 
     gamma, c1 = state()
     tau, c2 = state()
@@ -187,10 +261,10 @@ def _level3_robustness(rho: np.ndarray, dims3: list[int], solver: str | None, so
     cons = c1 + c2 + c3 + [t >= 0]
 
     # Symmetries of the inflated networks under permuting copies.
-    cons.append(_cp_permute(tau, [1, 0, 2], copies) == tau)
-    cons.append(_cp_permute(gamma, [1, 2, 0], copies) == gamma)
-    cons.append(_cp_permute(sigma, [1, 0, 2], copies) == sigma)
-    cons.append(_cp_permute(sigma, [0, 2, 1], copies) == sigma)
+    cons.append(eq(_cp_permute(tau, [1, 0, 2], copies), tau, q9))
+    cons.append(eq(_cp_permute(gamma, [1, 2, 0], copies), gamma, q9))
+    cons.append(eq(_cp_permute(sigma, [1, 0, 2], copies), sigma, q9))
+    cons.append(eq(_cp_permute(sigma, [0, 2, 1], copies), sigma, q9))
 
     def marg(X, keep):
         d_out = int(np.prod([dims9[k] for k in keep]))
@@ -198,27 +272,34 @@ def _level3_robustness(rho: np.ndarray, dims3: list[int], solver: str | None, so
 
     def ppt(X, keep, transposed):
         sub = [dims9[k] for k in keep]
-        return _cp_partial_transpose(marg(X, keep), [keep.index(k) for k in transposed], sub) >> 0
+        pt = _cp_partial_transpose(marg(X, keep), [keep.index(k) for k in transposed], sub)
+        return psd(pt, _total_charge(sub, [-1 if k in transposed else 1 for k in keep]))
 
-    cons.append(marg(sigma, [0, 1, 2]) == t * rho + (1 - t) * np.eye(D3) / D3)
+    q3 = _total_charge(dims3)
+    target = t * rho + (1 - t) * np.eye(D3) / D3
+    cons.append(eq(marg(sigma, [0, 1, 2]), target, q3))
+
+    def eq7(A, keepA, B, keepB):
+        return eq(marg(A, keepA), marg(B, keepB), _total_charge([dims9[k] for k in keepA]))
+
     # Seven-party marginals shared by gamma and tau.
-    cons.append(marg(gamma, [7, 8, 0, 1, 2, 4, 5]) == marg(tau, [4, 5, 0, 1, 2, 7, 8]))
-    cons.append(marg(gamma, [8, 0, 1, 2, 3, 5, 6]) == marg(tau, [5, 0, 1, 2, 3, 8, 6]))
-    cons.append(marg(gamma, [0, 1, 2, 3, 4, 6, 7]) == marg(tau, [0, 1, 2, 3, 4, 6, 7]))
+    cons.append(eq7(gamma, [7, 8, 0, 1, 2, 4, 5], tau, [4, 5, 0, 1, 2, 7, 8]))
+    cons.append(eq7(gamma, [8, 0, 1, 2, 3, 5, 6], tau, [5, 0, 1, 2, 3, 8, 6]))
+    cons.append(eq7(gamma, [0, 1, 2, 3, 4, 6, 7], tau, [0, 1, 2, 3, 4, 6, 7]))
     # Seven-party marginals shared by tau and sigma.
-    cons.append(marg(tau, [0, 1, 3, 4, 6, 7, 8]) == marg(sigma, [0, 1, 3, 4, 6, 7, 8]))
-    cons.append(marg(tau, [1, 2, 4, 5, 6, 7, 8]) == marg(sigma, [1, 2, 4, 5, 6, 7, 8]))
-    cons.append(marg(tau, [2, 3, 5, 0, 6, 7, 8]) == marg(sigma, [2, 0, 5, 3, 6, 7, 8]))
+    cons.append(eq7(tau, [0, 1, 3, 4, 6, 7, 8], sigma, [0, 1, 3, 4, 6, 7, 8]))
+    cons.append(eq7(tau, [1, 2, 4, 5, 6, 7, 8], sigma, [1, 2, 4, 5, 6, 7, 8]))
+    cons.append(eq7(tau, [2, 3, 5, 0, 6, 7, 8], sigma, [2, 0, 5, 3, 6, 7, 8]))
     # PPT relaxations of separability between disconnected groups of parties.
-    cons.append(_cp_partial_transpose(tau, [2], copies) >> 0)
-    cons.append(_cp_partial_transpose(sigma, [0], copies) >> 0)
+    cons += ppt(tau, list(range(9)), [6, 7, 8])
+    cons += ppt(sigma, list(range(9)), [0, 1, 2])
     for keep in ([0, 2, 3, 4, 5, 6, 7], [1, 3, 4, 5, 6, 7, 8], [2, 4, 5, 6, 7, 8, 0]):
-        cons.append(ppt(gamma, keep, [keep[0]]))
+        cons += ppt(gamma, keep, [keep[0]])
     for keep in ([0, 1, 2, 4, 5, 6, 7], [1, 2, 3, 5, 6, 7, 8], [2, 3, 4, 6, 7, 8, 0]):
-        cons.append(ppt(gamma, keep, keep[:3]))
+        cons += ppt(gamma, keep, keep[:3])
     for keep in ([0, 2, 3, 4, 6, 7, 8], [1, 3, 4, 5, 6, 7, 8], [2, 4, 5, 0, 6, 7, 8]):
-        cons.append(ppt(tau, keep, [keep[0]]))
-        cons.append(ppt(tau, keep, keep[1:4]))
+        cons += ppt(tau, keep, [keep[0]])
+        cons += ppt(tau, keep, keep[1:4])
     return _solve(t, cons, solver, solver_kwargs)
 
 
@@ -233,7 +314,7 @@ def gilbert_criterion(rho: np.ndarray, sigma: np.ndarray) -> float:
     Supplemental Material Sec. A2. The same bound holds for any convex set that
     contains ``sigma`` and that ball, such as the biseparable states.
 
-    [3] L. Gurvits, H. Barnum, PRA 66, 062311 (2002).
+    [3] L. Gurvits, H. Barnum, PRA 66, 062311 (2002), arXiv:quant-ph/0204159.
     """
     rho = np.asarray(rho, dtype=complex)
     D = rho.shape[0]
