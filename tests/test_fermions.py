@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from scipy import sparse
 
 from medt.fermions import (
     compute_fermionic_partial_transpose_matrix,
@@ -9,6 +10,7 @@ from medt.fermions import (
     fermionic_partial_trace,
     fermionic_partial_transpose,
     fermionic_permute_systems,
+    fermionic_reduced_state,
     gaussian_wick_four_point_violations,
     jordan_wigner_majoranas,
     random_fermionic_density_matrix,
@@ -560,3 +562,37 @@ def test_optimized_methods_match_bruteforce_for_pdf_examples():
         sparse = fermionic_partial_transpose(rho, sys, dims, method="sparse")
         assert np.allclose(tensor, brute)
         assert np.allclose(sparse, brute)
+
+
+def _fock_ket(terms, modes, *, as_sparse=False):
+    """Ket sum_k a_k prod_{m in occ_k, increasing} c_m^dagger |0> on ``modes`` modes."""
+    idx = [sum(1 << (modes - 1 - m) for m in occ) for _, occ in terms]
+    amp = np.array([a for a, _ in terms], dtype=complex)
+    amp /= np.linalg.norm(amp)
+    if as_sparse:
+        return sparse.coo_array((amp, (np.array(idx),)), shape=(2**modes,))
+    psi = np.zeros(2**modes, dtype=complex)
+    psi[idx] = amp
+    return psi
+
+
+TERMS = [(1, (0, 2)), (1j, (1, 3)), (0.5, (0, 1, 2, 4)), (-0.7, ())]
+
+
+@pytest.mark.parametrize("keep", [[0, 3], [1, 4], [0, 2, 3], [4]])
+def test_fermionic_reduced_state_paths_agree(keep):
+    psi = _fock_ket(TERMS, 5)
+    rho = np.outer(psi, psi.conj())
+    traced = [m for m in range(5) if m not in keep]
+    expected = fermionic_partial_trace(rho, traced, [2] * 5)
+    assert np.allclose(fermionic_reduced_state(psi, keep), expected)
+    assert np.allclose(fermionic_reduced_state(rho, keep), expected)
+    assert np.allclose(fermionic_reduced_state(_fock_ket(TERMS, 5, as_sparse=True), keep), expected)
+    assert np.allclose(fermionic_reduced_state(sparse.coo_array(rho), keep), expected)
+
+
+def test_fermionic_reduced_state_of_24_modes():
+    # Padding with empty modes leaves the reduced state of the occupied modes unchanged.
+    small = fermionic_reduced_state(_fock_ket(TERMS, 5), [0, 3])
+    big = fermionic_reduced_state(_fock_ket(TERMS, 24, as_sparse=True), [0, 3])
+    assert np.allclose(big, small)

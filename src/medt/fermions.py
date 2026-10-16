@@ -228,6 +228,60 @@ def fermionic_partial_trace(X, trace_sys, dim=None):
     return tensor.reshape(2**kept_count, 2**kept_count)
 
 
+def _move_to_front_signs(index, keep, traced, modes):
+    """Sign of moving the occupied ``keep`` modes ahead of the ``traced`` ones, keeping relative order."""
+    keep = set(keep)
+    seen = np.zeros_like(index)  # parity of occupied traced modes passed so far
+    parity = np.zeros_like(index)
+    for m in range(modes):
+        bit = (index >> (modes - 1 - m)) & 1
+        if m in keep:
+            parity ^= bit & seen
+        else:
+            seen ^= bit
+    return 1 - 2 * parity
+
+
+def fermionic_reduced_state(state, keep, n_modes=None):
+    """Reduced density matrix of the fermionic modes ``keep`` (in increasing order).
+
+    ``state`` is a ket or density matrix in the occupation basis of ``n_modes``
+    modes, with the Jordan-Wigner ordering of :mod:`medt.fermions`; a ket can
+    be a SciPy sparse array. Each basis amplitude is multiplied by the sign of
+    moving the kept modes in front of the traced ones, after which the reduced
+    state is an ordinary partial trace (:func:`medt.linalg.partial_trace`). The
+    signs are computed in a vectorized pass over the nonzero amplitudes, so a
+    ket of 24 modes is handled without forming a density matrix.
+    """
+    from scipy import sparse
+
+    from medt.linalg import partial_trace
+
+    size = state.shape[0] if state.shape[0] > 1 else state.shape[-1]
+    modes = int(round(np.log2(size))) if n_modes is None else int(n_modes)
+    if 2**modes != size:
+        raise ValueError("state dimension must be 2**n_modes")
+    keep = sorted(int(k) for k in keep)
+    traced = [m for m in range(modes) if m not in keep]
+    dims = [2] * modes
+    if sparse.issparse(state):
+        X = sparse.coo_array(state)
+        is_ket = 1 in X.shape or X.ndim == 1
+        if not is_ket:
+            sr = _move_to_front_signs(X.row.astype(np.int64), keep, traced, modes)
+            sc = _move_to_front_signs(X.col.astype(np.int64), keep, traced, modes)
+            X = sparse.coo_array((X.data * sr * sc, (X.row, X.col)), shape=X.shape)
+            return partial_trace(X, keep, dims)
+        idx = (X.coords[0] if X.ndim == 1 else (X.row if X.shape[1] == 1 else X.col)).astype(np.int64)
+        signed = sparse.coo_array((X.data * _move_to_front_signs(idx, keep, traced, modes), (idx,)), shape=(size,))
+        return partial_trace(signed, keep, dims)
+    state = np.asarray(state)
+    sign = _move_to_front_signs(np.arange(size, dtype=np.int64), keep, traced, modes)
+    if state.ndim == 1 or state.shape[1] == 1:
+        return partial_trace(sign * state.reshape(-1), keep, dims)
+    return partial_trace(sign[:, None] * state * sign[None, :], keep, dims)
+
+
 def fermionic_partial_transpose(
     X,
     sys,
@@ -701,17 +755,19 @@ def _inverse_permutation(perm):
 
 
 def _fermionic_permutation_basis_action(perm, modes):
-    size = 2**modes
-    target_indices = np.empty(size, dtype=int)
-    signs = np.empty(size, dtype=np.complex128)
-
-    for old_index in range(size):
-        old_bits = _index_to_bits(old_index, modes)
-        new_bits, sign = _permute_bits_with_sign(old_bits, perm)
-        target_indices[_bits_to_index(new_bits)] = old_index
-        signs[_bits_to_index(new_bits)] = sign
-
-    return target_indices, signs
+    """Index map and exchange signs of a fermionic mode permutation, vectorized over the basis."""
+    new_index = np.arange(2**modes, dtype=np.int64)
+    # Bit of new position p (mode 0 is the most significant bit).
+    new_bits = [(new_index >> (modes - 1 - p)) & 1 for p in range(modes)]
+    old_index = np.zeros_like(new_index)
+    for p, old_mode in enumerate(perm):
+        old_index |= new_bits[p] << (modes - 1 - old_mode)
+    parity = np.zeros_like(new_index)
+    for left in range(modes):
+        for right in range(left + 1, modes):
+            if perm[left] > perm[right]:
+                parity ^= new_bits[left] & new_bits[right]
+    return old_index, (1 - 2 * parity).astype(np.complex128)
 
 
 def _bits_to_index(bits):
@@ -730,6 +786,7 @@ __all__ = [
     "gaussian_wick_four_point_violations",
     "fermionic_permute_systems",
     "fermionic_partial_trace",
+    "fermionic_reduced_state",
     "fermionic_partial_transpose",
     "fermionic_negativity",
     "fermionic_log_negativity",
