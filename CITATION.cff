@@ -45,15 +45,21 @@ references:
     conference: {name: "IEEE International Symposium on Information Theory (ISIT)"}
     year: 2026
     doi: 10.1109/ISIT62367.2026.11653617
+    identifiers:
+      - {type: other, value: "arXiv:2601.09590"}
   - type: article
-    title: "Multiparty entanglement microscopy of quantum Ising models in 1d, 2d and 3d"
+    title: "Multiparty entanglement microscopy of quantum Ising models in one, two, and three dimensions"
     authors:
       - {family-names: Lyu, given-names: Liuke}
       - {family-names: Song, given-names: M.}
       - {family-names: Wang, given-names: T.-T.}
       - {family-names: Meng, given-names: Z. Y.}
       - {family-names: Witczak-Krempa, given-names: William}
-    year: 2024
+    journal: "Physical Review B"
+    volume: 111
+    start: 245108
+    year: 2025
+    doi: 10.1103/PhysRevB.111.245108
     identifiers:
       - {type: other, value: "arXiv:2412.12533"}
   - type: article
@@ -65,6 +71,8 @@ references:
       - {family-names: Takei, given-names: S.}
       - {family-names: Sørensen, given-names: E. S.}
       - {family-names: Witczak-Krempa, given-names: William}
-    year: 2025
+    journal: "Nature Communications"
+    year: 2026
+    doi: 10.1038/s41467-026-71113-8
     identifiers:
       - {type: other, value: "arXiv:2505.18124"}

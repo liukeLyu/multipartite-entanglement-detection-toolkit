@@ -6,8 +6,8 @@ reordering modes picks up exchange signs, and the partial transpose is the
 fermionic one of Shapourian, Shiozaki and Ryu [1, 2], which respects the
 parity superselection rule.
 
-[1] H. Shapourian, K. Shiozaki, S. Ryu, PRB 95, 165101 (2017).
-[2] H. Shapourian, S. Ryu, PRA 99, 022310 (2019).
+[1] H. Shapourian, K. Shiozaki, S. Ryu, PRB 95, 165101 (2017), arXiv:1611.07536.
+[2] H. Shapourian, S. Ryu, PRA 99, 022310 (2019), arXiv:1804.08637.
 """
 
 from itertools import combinations

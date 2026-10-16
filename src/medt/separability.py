@@ -10,8 +10,9 @@ product states and that remainder, hence separable.
 For a bipartite state of total dimension ``D``, every state with
 ``tr rho^2 <= 1/(D - 1)`` is separable (Gurvits and Barnum [2]).
 
-[1] H. Kampermann, O. Gühne, C. Wilmott, D. Bruß, PRA 86, 032307 (2012).
-[2] L. Gurvits, H. Barnum, PRA 66, 062311 (2002).
+[1] H. Kampermann, O. Gühne, C. Wilmott, D. Bruß, PRA 86, 032307 (2012),
+    arXiv:1203.5872.
+[2] L. Gurvits, H. Barnum, PRA 66, 062311 (2002), arXiv:quant-ph/0204159.
 """
 
 from __future__ import annotations

@@ -6,9 +6,9 @@ convex roof is hard to evaluate, but it is known exactly for X states [2] and
 bounded from below by the ``I2`` criterion of Ma et al. [1].
 
 [1] Z.-H. Ma, Z.-H. Chen, J.-L. Chen, C. Spengler, A. Gabriel, M. Huber,
-    PRA 83, 062325 (2011).
+    PRA 83, 062325 (2011), arXiv:1101.2001.
 [2] S. M. Hashemi Rafsanjani, M. Huber, C. J. Broadbent, J. H. Eberly,
-    PRA 86, 062303 (2012).
+    PRA 86, 062303 (2012), arXiv:1208.2706.
 """
 
 from __future__ import annotations
@@ -154,11 +154,12 @@ def gmc_convex_roof(
     with ``U`` an isometry and ``(l_j, e_j)`` the eigenpairs of ``rho`` [1].
     This minimizes ``sum_k ||phi_k||^2 C(phi_k / ||phi_k||)`` over isometries by
     Riemannian gradient descent on the Stiefel manifold, as used in Lyu et al. [3].
+    The concurrence of each pure term is that of Ma et al. [1].
     Any decomposition gives an upper bound; the minimum is the convex roof.
 
     [3] L. Lyu, M. Song, T.-T. Wang, Z. Y. Meng, W. Witczak-Krempa, "Multiparty
-        entanglement microscopy of quantum Ising models in 1d, 2d and 3d",
-        arXiv:2412.12533.
+        entanglement microscopy of quantum Ising models in one, two, and three
+        dimensions", PRB 111, 245108 (2025), arXiv:2412.12533.
     """
     rho = np.asarray(rho, dtype=complex)
     if dims is None:

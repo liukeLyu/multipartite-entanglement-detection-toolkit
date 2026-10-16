@@ -48,7 +48,7 @@ def test_non_hermitian_rejected():
 
 
 # Reference values from Lyu, Chandorkar, Kapoor, Takei, Sorensen, Witczak-Krempa,
-# "Multiparty entanglement loops in quantum spin liquids", arXiv:2505.18124
+# "Multiparty entanglement loops in quantum spin liquids", Nat. Commun. (2026), arXiv:2505.18124
 # (Kitaev honeycomb model in a [111] field, N=32), computed with MOSEK.
 kitaev = np.load(DATA / "kitaev_rdms.npz")
 

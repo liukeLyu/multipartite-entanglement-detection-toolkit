@@ -15,8 +15,9 @@ For a state ``rho`` on ``n`` parties, GMN is ``-min tr(W rho)`` over Hermitian
 GMN > 0 certifies genuine multipartite entanglement. For ``n = 2`` it equals
 the negativity ``(||rho^{T_A}||_1 - 1) / 2``.
 
-[1] B. Jungnitsch, T. Moroder, O. Gühne, PRL 106, 190502 (2011).
-[2] M. Hofmann, T. Moroder, O. Gühne, J. Phys. A 47, 155301 (2014).
+[1] B. Jungnitsch, T. Moroder, O. Gühne, PRL 106, 190502 (2011), arXiv:1010.6049.
+[2] M. Hofmann, T. Moroder, O. Gühne, J. Phys. A 47, 155301 (2014),
+    arXiv:1401.2424.
 """
 
 from __future__ import annotations

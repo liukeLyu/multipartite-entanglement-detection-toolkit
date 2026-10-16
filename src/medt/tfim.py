@@ -2,8 +2,8 @@
 
 For the infinite chain ``H = -sum_i (X_i X_{i+1} + h Z_i)`` the model maps to
 free fermions, so every spin correlation is a Pfaffian of Majorana two-point
-functions [1, 2]. The reduced state of any set of sites, at zero or finite
-temperature, follows from its Pauli expansion
+functions [1, 2]. Following [3], the reduced state of any set of sites, at
+zero or finite temperature, follows from its Pauli expansion
 
     rho_S = 2^{-|S|} sum_P <P> P.
 
@@ -12,6 +12,7 @@ eight sites.
 
 [1] E. Lieb, T. Schultz, D. Mattis, Ann. Phys. 16, 407 (1961).
 [2] P. Pfeuty, Ann. Phys. 57, 79 (1970).
+[3] M. Fagotti, F. H. L. Essler, PRB 87, 245107 (2013), arXiv:1302.6944.
 """
 
 from __future__ import annotations
