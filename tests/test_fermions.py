@@ -653,3 +653,25 @@ def test_fermionic_reduced_state_reordering_is_signed_permutation():
     # Naive (unsigned) reordering differs, so the test is sensitive to the signs.
     naive = permute_subsystems(sorted_rdm, [2, 0, 1], [2, 2, 2])
     assert not np.allclose(fermionic_reduced_state(rho, [4, 0, 2]), naive)
+
+
+def _reduce_along(rho, path):
+    """Apply successive fermionic reductions; each step lists modes of the current state."""
+    for keep in path:
+        rho = fermionic_reduced_state(rho, keep)
+    return rho
+
+
+@pytest.mark.parametrize("seed", range(5))
+def test_fermionic_reduced_state_two_step_paths_agree(seed):
+    # Reduce a 7-mode state to modes (5, 1, 3) along random two-step paths with
+    # reorderings at each step; every path must give the same final state.
+    rng = np.random.default_rng(seed)
+    modes, target = 7, [5, 1, 3]
+    rho = random_fermionic_density_matrix(modes, seed=seed)
+    expected = fermionic_reduced_state(rho, target)
+    for _ in range(3):
+        extra = [m for m in range(modes) if m not in target]
+        middle = list(rng.permutation(target + list(rng.choice(extra, size=2, replace=False))))
+        second = [middle.index(m) for m in target]
+        assert np.allclose(_reduce_along(rho, [middle, second]), expected)
