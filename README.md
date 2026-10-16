@@ -147,7 +147,7 @@ SDPs go through [CVXPY](https://www.cvxpy.org), so any installed solver works (`
 ```bash
 pip install -e ".[dev]"
 pytest              # fast suite, a few minutes
-pytest -m slow      # slow checks: 6-qubit GMN and level-3 inflation against published values
+pytest -m slow      # slow checks (~20 min): 6-qubit GMN, level-3 inflation, the tour notebook
 ```
 
 ## Validation

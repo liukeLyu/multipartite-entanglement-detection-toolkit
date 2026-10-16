@@ -18,7 +18,7 @@ examples = ["jupyter", "matplotlib"]
 dev = ["pytest>=7", "ruff>=0.5", "picos>=2.4", "qics>=1.0", "matplotlib", "nbclient", "ipykernel"]
 
 [tool.pytest.ini_options]
-markers = ["slow: takes about a minute (run with -m slow)"]
+markers = ["slow: minutes each; the whole slow set takes about 20 minutes (run with -m slow)"]
 addopts = "-m 'not slow'"
 
 [tool.ruff]
