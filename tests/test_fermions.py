@@ -5,12 +5,12 @@ from scipy import sparse
 from medt.fermions import (
     compute_fermionic_partial_transpose_matrix,
     fermionic_gaussian_thermal_state,
+    fermionic_keep_systems,
     fermionic_log_negativity,
     fermionic_negativity,
     fermionic_partial_trace,
     fermionic_partial_transpose,
     fermionic_permute_systems,
-    fermionic_reduced_state,
     gaussian_wick_four_point_violations,
     jordan_wigner_majoranas,
     random_fermionic_density_matrix,
@@ -580,21 +580,21 @@ TERMS = [(1, (0, 2)), (1j, (1, 3)), (0.5, (0, 1, 2, 4)), (-0.7, ())]
 
 
 @pytest.mark.parametrize("keep", [[0, 3], [1, 4], [0, 2, 3], [4]])
-def test_fermionic_reduced_state_paths_agree(keep):
+def test_fermionic_keep_systems_paths_agree(keep):
     psi = _fock_ket(TERMS, 5)
     rho = np.outer(psi, psi.conj())
     traced = [m for m in range(5) if m not in keep]
     expected = fermionic_partial_trace(rho, traced, [2] * 5)
-    assert np.allclose(fermionic_reduced_state(psi, keep), expected)
-    assert np.allclose(fermionic_reduced_state(rho, keep), expected)
-    assert np.allclose(fermionic_reduced_state(_fock_ket(TERMS, 5, as_sparse=True), keep), expected)
-    assert np.allclose(fermionic_reduced_state(sparse.coo_array(rho), keep), expected)
+    assert np.allclose(fermionic_keep_systems(psi, keep), expected)
+    assert np.allclose(fermionic_keep_systems(rho, keep), expected)
+    assert np.allclose(fermionic_keep_systems(_fock_ket(TERMS, 5, as_sparse=True), keep), expected)
+    assert np.allclose(fermionic_keep_systems(sparse.coo_array(rho), keep), expected)
 
 
-def test_fermionic_reduced_state_of_24_modes():
+def test_fermionic_keep_systems_of_24_modes():
     # Padding with empty modes leaves the reduced state of the occupied modes unchanged.
-    small = fermionic_reduced_state(_fock_ket(TERMS, 5), [0, 3])
-    big = fermionic_reduced_state(_fock_ket(TERMS, 24, as_sparse=True), [0, 3])
+    small = fermionic_keep_systems(_fock_ket(TERMS, 5), [0, 3])
+    big = fermionic_keep_systems(_fock_ket(TERMS, 24, as_sparse=True), [0, 3])
     assert np.allclose(big, small)
 
 
@@ -620,58 +620,72 @@ def _check_defining_property(rho_full, rdm, keep, modes):
 
 
 @pytest.mark.parametrize("keep", [[0, 2], [3, 1], [4, 0, 2], [2, 4, 1, 3], [1]])
-def test_fermionic_reduced_state_reproduces_all_majorana_expectations(keep):
+def test_fermionic_keep_systems_reproduces_all_majorana_expectations(keep):
     modes = 5
     rho = random_fermionic_density_matrix(modes, seed=7)
-    _check_defining_property(rho, fermionic_reduced_state(rho, keep), keep, modes)
+    _check_defining_property(rho, fermionic_keep_systems(rho, keep), keep, modes)
     psi = _fock_ket(TERMS, modes)
-    _check_defining_property(np.outer(psi, psi.conj()), fermionic_reduced_state(psi, keep), keep, modes)
+    _check_defining_property(np.outer(psi, psi.conj()), fermionic_keep_systems(psi, keep), keep, modes)
 
 
-def test_fermionic_reduced_state_of_gaussian_state():
+def test_fermionic_keep_systems_of_gaussian_state():
     # A thermal free-fermion state: reduced states must reproduce all its correlations.
     modes = 4
     rng = np.random.default_rng(3)
     A = rng.normal(size=(2 * modes, 2 * modes))
     rho = fermionic_gaussian_thermal_state(A - A.T, beta=0.8)
     for keep in ([0, 3], [2, 0], [3, 1, 2]):
-        _check_defining_property(rho, fermionic_reduced_state(rho, keep), keep, modes)
+        _check_defining_property(rho, fermionic_keep_systems(rho, keep), keep, modes)
 
 
-def test_fermionic_reduced_state_composes():
+def test_fermionic_keep_systems_composes():
     # Tracing out modes in two steps agrees with tracing them out at once, for any order.
     rho = random_fermionic_density_matrix(5, seed=11)
-    direct = fermionic_reduced_state(rho, [4, 1])
-    step = fermionic_reduced_state(fermionic_reduced_state(rho, [1, 3, 4]), [2, 0])
+    direct = fermionic_keep_systems(rho, [4, 1])
+    step = fermionic_keep_systems(fermionic_keep_systems(rho, [1, 3, 4]), [2, 0])
     assert np.allclose(direct, step)
 
 
-def test_fermionic_reduced_state_reordering_is_signed_permutation():
+def test_fermionic_keep_systems_reordering_is_signed_permutation():
     rho = random_fermionic_density_matrix(5, seed=5)
-    sorted_rdm = fermionic_reduced_state(rho, [0, 2, 4])
-    assert np.allclose(fermionic_reduced_state(rho, [4, 0, 2]), fermionic_permute_systems(sorted_rdm, [2, 0, 1]))
+    sorted_rdm = fermionic_keep_systems(rho, [0, 2, 4])
+    assert np.allclose(fermionic_keep_systems(rho, [4, 0, 2]), fermionic_permute_systems(sorted_rdm, [2, 0, 1]))
     # Naive (unsigned) reordering differs, so the test is sensitive to the signs.
     naive = permute_subsystems(sorted_rdm, [2, 0, 1], [2, 2, 2])
-    assert not np.allclose(fermionic_reduced_state(rho, [4, 0, 2]), naive)
+    assert not np.allclose(fermionic_keep_systems(rho, [4, 0, 2]), naive)
 
 
 def _reduce_along(rho, path):
     """Apply successive fermionic reductions; each step lists modes of the current state."""
     for keep in path:
-        rho = fermionic_reduced_state(rho, keep)
+        rho = fermionic_keep_systems(rho, keep)
     return rho
 
 
 @pytest.mark.parametrize("seed", range(5))
-def test_fermionic_reduced_state_two_step_paths_agree(seed):
+def test_fermionic_keep_systems_two_step_paths_agree(seed):
     # Reduce a 7-mode state to modes (5, 1, 3) along random two-step paths with
     # reorderings at each step; every path must give the same final state.
     rng = np.random.default_rng(seed)
     modes, target = 7, [5, 1, 3]
     rho = random_fermionic_density_matrix(modes, seed=seed)
-    expected = fermionic_reduced_state(rho, target)
+    expected = fermionic_keep_systems(rho, target)
     for _ in range(3):
         extra = [m for m in range(modes) if m not in target]
         middle = list(rng.permutation(target + list(rng.choice(extra, size=2, replace=False))))
         second = [middle.index(m) for m in target]
         assert np.allclose(_reduce_along(rho, [middle, second]), expected)
+
+
+@pytest.mark.parametrize("seed", range(4))
+def test_fermionic_keep_systems_equals_partial_trace_then_signed_permute(seed):
+    rng = np.random.default_rng(seed)
+    modes = 6
+    rho = random_fermionic_density_matrix(modes, seed=seed)
+    for _ in range(4):
+        keep = [int(k) for k in rng.permutation(modes)[: rng.integers(1, modes + 1)]]
+        trace_out = [m for m in range(modes) if m not in keep]
+        ranked = sorted(keep)
+        reduced = fermionic_partial_trace(rho, trace_out)
+        expected = fermionic_permute_systems(reduced, [ranked.index(k) for k in keep])
+        assert np.allclose(fermionic_keep_systems(rho, keep), expected)

@@ -52,7 +52,7 @@ def _sym_bases(d: int) -> tuple[np.ndarray, np.ndarray]:
 
 
 def _trace_map(keep: Sequence[int], dims: Sequence[int]) -> sparse.csr_matrix:
-    """Sparse matrix of ``vec(X) -> vec(partial_trace(X, keep, dims))`` (row-major)."""
+    """Sparse matrix of ``vec(X) -> vec(keep_systems(X, keep, dims))`` (row-major)."""
     D = int(np.prod(dims))
     n = len(dims)
     keep = list(keep)

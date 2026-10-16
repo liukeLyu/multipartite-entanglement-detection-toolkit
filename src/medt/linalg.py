@@ -1,8 +1,9 @@
 """Tensor-product helpers for states and density matrices.
 
 Subsystems are ordered as in ``np.kron(A_1, A_2, ..., A_n)``: subsystem 0 is the
-most significant index. Subsystem labels are 0-based, and :func:`partial_trace`
-takes the subsystems to keep rather than the ones to trace out.
+most significant index, and subsystem labels are 0-based. :func:`partial_trace`
+takes the subsystems to trace out; :func:`keep_systems` takes the subsystems
+to keep, in the order wanted for the output.
 """
 
 from __future__ import annotations
@@ -60,8 +61,8 @@ def _split_index(idx: np.ndarray, dims: Sequence[int], keep: Sequence[int], trac
     return a, b
 
 
-def partial_trace(state, keep: Sequence[int], dims: Sequence[int]) -> np.ndarray:
-    """Reduced density matrix on the subsystems ``keep``, in the order given.
+def keep_systems(state, keep: Sequence[int], dims: Sequence[int]) -> np.ndarray:
+    """Reduced density matrix on the subsystems ``keep``, ordered as listed in ``keep``.
 
     ``state`` can be a ket (1D array or column vector) or a density matrix, and
     either can be a SciPy sparse array. A ket is never expanded into a density
@@ -112,6 +113,17 @@ def partial_trace(state, keep: Sequence[int], dims: Sequence[int]) -> np.ndarray
     # Move kept row indices, then traced row indices, then the same for columns.
     t = t.transpose(keep + traced + [n + k for k in keep] + [n + k for k in traced])
     return np.einsum("ajbj->ab", t.reshape(dk, dt, dk, dt))
+
+
+def partial_trace(state, trace_out: Sequence[int], dims: Sequence[int]) -> np.ndarray:
+    """Trace out the subsystems ``trace_out``; the rest keep their original order.
+
+    Accepts the same inputs as :func:`keep_systems`.
+    """
+    trace_out = {int(k) for k in trace_out}
+    if any(not 0 <= k < len(dims) for k in trace_out):
+        raise ValueError(f"trace_out={sorted(trace_out)} is out of range for {len(dims)} subsystems")
+    return keep_systems(state, [k for k in range(len(dims)) if k not in trace_out], dims)
 
 
 def realign(rho: np.ndarray, dims: Sequence[int]) -> np.ndarray:

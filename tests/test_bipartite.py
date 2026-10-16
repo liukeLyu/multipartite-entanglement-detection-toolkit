@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from medt import ccnr, is_ppt, log_negativity, partial_trace, realign
+from medt import ccnr, is_ppt, keep_systems, log_negativity, realign
 from tests.states import horodecki_3x3, ket_to_rho
 
 
@@ -11,11 +11,11 @@ def test_realign_of_product():
     assert np.allclose(realign(np.kron(A, B), (2, 3)), np.outer(A.ravel(), B.ravel()))
 
 
-def test_partial_trace_of_product():
+def test_keep_systems_of_product():
     rng = np.random.default_rng(1)
     A, B, C = (rng.normal(size=(d, d)) for d in (2, 3, 2))
     X = np.kron(np.kron(A, B), C)
-    assert np.allclose(partial_trace(X, (2, 0), (2, 3, 2)), np.trace(B) * np.kron(C, A))
+    assert np.allclose(keep_systems(X, (2, 0), (2, 3, 2)), np.trace(B) * np.kron(C, A))
 
 
 def test_bell_state():

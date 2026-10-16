@@ -4,7 +4,7 @@ from medt import fermions, states, tfim
 from medt.bipartite import ccnr, is_ppt, log_negativity
 from medt.concurrence import gmc_convex_roof, gmc_lower_bound, gmc_pure, gmc_x_state
 from medt.gmn import fermionic_gmn, gmn, negativity
-from medt.linalg import partial_trace, partial_transpose, permute_subsystems, realign
+from medt.linalg import keep_systems, partial_trace, partial_transpose, permute_subsystems, realign
 from medt.network import gilbert_criterion, ring_inflation_robustness
 from medt.polytope import (
     polytope_biseparable,
@@ -32,6 +32,7 @@ __all__ = [
     "kampermann_sep",
     "log_negativity",
     "negativity",
+    "keep_systems",
     "partial_trace",
     "partial_transpose",
     "permute_subsystems",

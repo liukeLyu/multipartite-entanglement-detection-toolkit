@@ -92,15 +92,15 @@ sigma = np.diag([0.5, 0, 0, 0, 0, 0, 0, 0.5])             # any known network st
 medt.gilbert_criterion(ket_to_dm(ghz(3)), sigma)          # noise above which rho is a network state
 ```
 
-Reduced states of large systems. `partial_trace` takes a ket or a density matrix, dense or SciPy sparse, and never builds the full density matrix of a ket, so a dense 24-qubit ket reduces to a few sites in about a second. `medt.fermions.fermionic_reduced_state` does the same for fermionic modes, including the signs from reordering modes. Both return the kept subsystems in the order listed in `keep`; `permute_subsystems` and `medt.fermions.fermionic_permute_systems` reorder a state on their own.
+Reduced states of large systems. `keep_systems(state, keep, dims)` returns the reduced state of the subsystems in `keep`, ordered as listed, and `partial_trace(state, trace_out, dims)` traces out the listed subsystems and keeps the rest in their original order. Both take a ket or a density matrix, dense or SciPy sparse, and never builds the full density matrix of a ket, so a dense 24-qubit ket reduces to a few sites in about a second. `medt.fermions.fermionic_keep_systems` and `fermionic_partial_trace` do the same for fermionic modes, including the signs from reordering modes. `permute_subsystems` and `medt.fermions.fermionic_permute_systems` reorder a state on their own.
 
 ```python
 from scipy import sparse
 n = 24
 w24 = sparse.coo_array((np.full(n, n**-0.5), (1 << np.arange(n),)), shape=(2**n,))  # sparse W state
-rho_pair = medt.partial_trace(w24, [3, 17], [2] * n)        # reduced state of qubits 3 and 17
+rho_pair = medt.keep_systems(w24, [3, 17], [2] * n)         # reduced state of qubits 3 and 17
 pair_ket = np.zeros(2**n); pair_ket[[2**23 + 2**21, 2**22 + 2**20]] = 2**-0.5  # (c0+c2+ + c1+c3+)|0>/sqrt(2)
-medt.fermions.fermionic_reduced_state(pair_ket, [0, 3])     # fermionic reduced state of modes 0 and 3
+medt.fermions.fermionic_keep_systems(pair_ket, [3, 0])      # fermionic reduced state of modes 3 and 0, in that order
 ```
 
 Many-body input: exact reduced states of the infinite transverse-field Ising chain ``H = -sum_i (X_i X_{i+1} + h Z_i)``.
@@ -130,7 +130,7 @@ Numbers refer to the References section. "Method" is where the criterion was int
 | Adaptive polytopes: separable, fully separable, biseparable | `polytope_*` | [11] | |
 | Network entanglement: ring inflation, level 2 (symmetry reduced) and level 3 | `ring_inflation_robustness` | [12, 15] | [15] |
 | Network entanglement: Gilbert criterion | `gilbert_criterion` | [10, 15] | [15] |
-| Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic | `partial_trace`, `medt.fermions.fermionic_reduced_state` | | |
+| Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic | `keep_systems`, `partial_trace`, `medt.fermions.fermionic_keep_systems`, `fermionic_partial_trace` | | |
 | Transverse-field Ising reduced states | `medt.tfim.tfim_rdm` | [21, 22, 23] | [14, 15] |
 
 Benchmark states live in `medt.states` (GHZ, W, Dicke, Werner, isotropic), and `medt.tfim.tfim_rdm(h, sites, beta)` gives exact reduced states of the infinite transverse-field Ising chain for any set of sites at zero or finite temperature.

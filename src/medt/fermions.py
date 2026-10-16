@@ -199,33 +199,17 @@ def fermionic_permute_systems(X, perm, dim=None):
 
 
 def fermionic_partial_trace(X, trace_sys, dim=None):
-    """Trace out fermionic modes.
+    """Trace out the fermionic modes ``trace_sys``; the rest keep their original order.
 
-    The output is ordered by the kept modes in their original relative order.
-    Internally, arbitrary traced modes are first moved to the end using a signed
-    fermionic mode permutation, then an ordinary tensor partial trace is applied.
+    ``X`` is a ket or density matrix, dense or SciPy sparse. See
+    :func:`fermionic_keep_systems` for the sign convention.
     """
-    matrix = np.asarray(X, dtype=np.complex128)
-    modes, dims = _validate_fermionic_operator(matrix, dim)
-    traced_modes = _validate_modes(trace_sys, modes)
-    kept_modes = [mode for mode in range(modes) if mode not in set(traced_modes)]
-
-    if not traced_modes:
-        return matrix.copy()
-    if not kept_modes:
-        return np.array([[np.trace(matrix)]], dtype=np.complex128)
-
-    perm = kept_modes + traced_modes
-    grouped = fermionic_permute_systems(matrix, perm, dims)
-    kept_count = len(kept_modes)
-    traced_count = len(traced_modes)
-    tensor = grouped.reshape([2] * (2 * modes))
-
-    for _ in range(traced_count):
-        tensor = np.trace(tensor, axis1=kept_count, axis2=2 * kept_count + traced_count)
-        traced_count -= 1
-
-    return tensor.reshape(2**kept_count, 2**kept_count)
+    size = X.shape[0] if X.shape[0] > 1 else X.shape[-1]
+    modes = int(round(np.log2(size)))
+    if dim is not None and (len(dim) != modes or any(int(d) != 2 for d in dim)):
+        raise ValueError("fermionic modes have dimension 2")
+    traced = _validate_modes(trace_sys, modes)
+    return fermionic_keep_systems(X, [m for m in range(modes) if m not in set(traced)], modes)
 
 
 def _move_to_front_signs(index, keep, traced, modes):
@@ -242,14 +226,14 @@ def _move_to_front_signs(index, keep, traced, modes):
     return 1 - 2 * parity
 
 
-def fermionic_reduced_state(state, keep, n_modes=None):
+def fermionic_keep_systems(state, keep, n_modes=None):
     """Reduced density matrix of the fermionic modes ``keep``, in the order given.
 
     ``state`` is a ket or density matrix in the occupation basis of ``n_modes``
     modes, with the Jordan-Wigner ordering of :mod:`medt.fermions`; a ket can
     be a SciPy sparse array. Each basis amplitude is multiplied by the sign of
     moving the kept modes in front of the traced ones, after which the reduced
-    state is an ordinary partial trace (:func:`medt.linalg.partial_trace`). The
+    state is an ordinary partial trace (:func:`medt.linalg.keep_systems`). The
     signs are computed in a vectorized pass over the nonzero amplitudes, so a
     ket of 24 modes is handled without forming a density matrix. If ``keep`` is
     not increasing, the kept modes are then reordered with
@@ -272,7 +256,7 @@ def fermionic_reduced_state(state, keep, n_modes=None):
 def _fermionic_reduced_sorted(state, keep, n_modes):
     from scipy import sparse
 
-    from medt.linalg import partial_trace
+    from medt.linalg import keep_systems
 
     size = state.shape[0] if state.shape[0] > 1 else state.shape[-1]
     modes = int(round(np.log2(size))) if n_modes is None else int(n_modes)
@@ -288,15 +272,15 @@ def _fermionic_reduced_sorted(state, keep, n_modes):
             sr = _move_to_front_signs(X.row.astype(np.int64), keep, traced, modes)
             sc = _move_to_front_signs(X.col.astype(np.int64), keep, traced, modes)
             X = sparse.coo_array((X.data * sr * sc, (X.row, X.col)), shape=X.shape)
-            return partial_trace(X, keep, dims)
+            return keep_systems(X, keep, dims)
         idx = (X.coords[0] if X.ndim == 1 else (X.row if X.shape[1] == 1 else X.col)).astype(np.int64)
         signed = sparse.coo_array((X.data * _move_to_front_signs(idx, keep, traced, modes), (idx,)), shape=(size,))
-        return partial_trace(signed, keep, dims)
+        return keep_systems(signed, keep, dims)
     state = np.asarray(state)
     sign = _move_to_front_signs(np.arange(size, dtype=np.int64), keep, traced, modes)
     if state.ndim == 1 or state.shape[1] == 1:
-        return partial_trace(sign * state.reshape(-1), keep, dims)
-    return partial_trace(sign[:, None] * state * sign[None, :], keep, dims)
+        return keep_systems(sign * state.reshape(-1), keep, dims)
+    return keep_systems(sign[:, None] * state * sign[None, :], keep, dims)
 
 
 def fermionic_partial_transpose(
@@ -803,7 +787,7 @@ __all__ = [
     "gaussian_wick_four_point_violations",
     "fermionic_permute_systems",
     "fermionic_partial_trace",
-    "fermionic_reduced_state",
+    "fermionic_keep_systems",
     "fermionic_partial_transpose",
     "fermionic_negativity",
     "fermionic_log_negativity",

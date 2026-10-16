@@ -18,7 +18,7 @@ from collections.abc import Sequence
 import numpy as np
 from scipy.optimize import minimize
 
-from medt.linalg import bipartitions, partial_trace
+from medt.linalg import bipartitions, keep_systems
 
 
 def gmc_pure(psi: np.ndarray, dims: Sequence[int] | None = None) -> float:
@@ -29,7 +29,7 @@ def gmc_pure(psi: np.ndarray, dims: Sequence[int] | None = None) -> float:
         dims = (2,) * int(round(np.log2(psi.size)))
     rho = np.outer(psi, psi.conj())
     purities = [np.real(np.trace(r @ r)) for r in
-                (partial_trace(rho, M, dims) for M in bipartitions(len(dims)))]
+                (keep_systems(rho, M, dims) for M in bipartitions(len(dims)))]
     return float(np.sqrt(max(0.0, 2 * (1 - max(purities)))))
 
 
