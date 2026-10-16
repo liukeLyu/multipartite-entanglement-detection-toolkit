@@ -12,7 +12,8 @@ relative entropy cone is handled natively by the QICS solver [2] through
 PICOS, which are optional dependencies (``pip install medt[rains]``).
 
 [1] H. S. Murray, S. Bhattacharya, M. Cerezo, L. Lyu, M. M. Wilde,
-    "Genuine multipartite Rains entanglement", arXiv:2601.09590.
+    "Genuine multipartite Rains entanglement", IEEE ISIT 2026,
+    doi:10.1109/ISIT62367.2026.11653617, arXiv:2601.09590.
 [2] K. He, J. Saunderson, H. Fawzi, "QICS: Quantum Information Conic Solver",
     arXiv:2410.17803.
 """

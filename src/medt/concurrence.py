@@ -156,8 +156,9 @@ def gmc_convex_roof(
     Riemannian gradient descent on the Stiefel manifold, as used in Lyu et al. [3].
     Any decomposition gives an upper bound; the minimum is the convex roof.
 
-    [3] L. Lyu et al., "Multiparty entanglement microscopy of quantum Ising
-        models in one, two, and three dimensions".
+    [3] L. Lyu, M. Song, T.-T. Wang, Z. Y. Meng, W. Witczak-Krempa, "Multiparty
+        entanglement microscopy of quantum Ising models in 1d, 2d and 3d",
+        arXiv:2412.12533.
     """
     rho = np.asarray(rho, dtype=complex)
     if dims is None:

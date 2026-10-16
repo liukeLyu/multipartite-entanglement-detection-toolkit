@@ -191,8 +191,9 @@ def fermionic_gmn(
 
     The PPT-mixture SDP of :func:`gmn` with each partial transpose replaced by
     the fermionic partial transpose of :mod:`medt.fermions`, following
-    Allen and Witczak-Krempa, arXiv:2509.12109. Each party is one fermionic
-    mode. For two modes it equals the fermionic negativity.
+    J. Allen, L. Lyu, W. Witczak-Krempa, "Fermionic genuine multiparty
+    entanglement", arXiv:2607.20707. Each party is one fermionic mode. For two
+    modes it equals the fermionic negativity.
     """
     from medt.fermions import compute_fermionic_partial_transpose_matrix
 
