@@ -2,12 +2,13 @@
 
 from entdetect.bipartite import ccnr, is_ppt, log_negativity
 from entdetect.concurrence import gmc_lower_bound, gmc_pure, gmc_x_state
-from entdetect.gmn import gmn, negativity
+from entdetect.gmn import fermionic_gmn, gmn, negativity
 from entdetect.linalg import partial_trace, partial_transpose, permute_subsystems, realign
 from entdetect.separability import kampermann_sep
 
 __all__ = [
     "ccnr",
+    "fermionic_gmn",
     "gmc_lower_bound",
     "gmc_pure",
     "gmc_x_state",

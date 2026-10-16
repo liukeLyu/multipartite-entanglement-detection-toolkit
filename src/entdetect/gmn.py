@@ -129,3 +129,57 @@ def negativity(
     rho, dims = _validate(rho, dims)
     eig = np.linalg.eigvalsh(partial_transpose(rho, sys, dims))
     return float(-eig[eig < 0].sum())
+
+
+def fermionic_gmn(
+    rho: np.ndarray,
+    n_modes: int | None = None,
+    *,
+    solver: str | None = None,
+    return_witness: bool = False,
+    **solver_kwargs,
+):
+    """Fermionic genuine multiparticle negativity of a state of ``n_modes`` modes.
+
+    The PPT-mixture SDP of :func:`gmn` with each partial transpose replaced by
+    the fermionic partial transpose of :mod:`entdetect.fermions`, following
+    Allen and Witczak-Krempa, arXiv:2509.12109. Each party is one fermionic
+    mode. For two modes it equals the fermionic negativity.
+    """
+    from entdetect.fermions import compute_fermionic_partial_transpose_matrix
+
+    rho = np.asarray(rho, dtype=complex)
+    D = rho.shape[0]
+    if n_modes is None:
+        n_modes = int(round(np.log2(D)))
+    if rho.shape != (2**n_modes, 2**n_modes):
+        raise ValueError(f"rho must be {2**n_modes} x {2**n_modes} for {n_modes} modes")
+    dims = [2] * n_modes
+    eye = np.eye(D)
+    W = cp.Variable((D, D), complex=True)
+    constraints = []
+    for M in bipartitions(n_modes):
+        F = compute_fermionic_partial_transpose_matrix(list(M), dims, include_particle_hole_unitary=False)
+        P = cp.Variable((D, D), complex=True)
+        Q = cp.Variable((D, D), complex=True)
+        # The fermionic partial transpose does not preserve Hermiticity, so Q is
+        # a general matrix with singular values of 2Q - 1 at most one.
+        disk = 2 * Q - eye
+        Q_ft = cp.reshape(F @ cp.vec(Q, order="C"), (D, D), order="C")
+        constraints += [
+            W == P + Q_ft,
+            P + P.H >> 0,
+            cp.bmat([[eye, disk], [disk.H, eye]]) >> 0,
+        ]
+    prob = cp.Problem(cp.Minimize(cp.real(cp.trace(rho @ W))), constraints)
+    if solver is None:
+        solver = "CLARABEL" if D <= 16 else "SCS"
+        if solver == "SCS":
+            solver_kwargs.setdefault("eps", 1e-8)
+    prob.solve(solver=solver, **solver_kwargs)
+    if prob.status not in (cp.OPTIMAL, cp.OPTIMAL_INACCURATE):
+        raise RuntimeError(f"SDP solver returned status {prob.status!r}")
+    value = float(-prob.value)
+    if not return_witness:
+        return value
+    return GMNResult(value=value, witness=np.asarray(W.value), status=prob.status)
