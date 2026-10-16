@@ -64,6 +64,17 @@ def _pt_index(sys: Sequence[int], dims: Sequence[int]) -> np.ndarray:
     return partial_transpose(np.arange(D * D).reshape(D, D), sys, dims).ravel()
 
 
+def _parity_sectors(rho: np.ndarray, tol: float = 1e-10):
+    """Even and odd index sets of Z (x) ... (x) Z, if rho commutes with it."""
+    D = rho.shape[0]
+    if D & (D - 1):
+        return None
+    parity = np.array([bin(i).count("1") % 2 for i in range(D)])
+    if np.abs(rho[np.ix_(parity == 0, parity == 1)]).max(initial=0) > tol:
+        return None
+    return [np.flatnonzero(parity == 0), np.flatnonzero(parity == 1)]
+
+
 def _cp_partial_transpose(X: cp.Expression, sys: Sequence[int], dims: Sequence[int]):
     # One gather instead of cp.partial_transpose's sum of Kronecker products,
     # which runs out of memory for six qubits.
@@ -78,6 +89,7 @@ def gmn(
     *,
     solver: str | None = None,
     return_witness: bool = False,
+    use_symmetry: bool = True,
     **solver_kwargs,
 ):
     """Renormalized genuine multiparticle negativity of ``rho``.
@@ -99,6 +111,10 @@ def gmn(
         is the most robust choice.
     return_witness : bool
         If True, return a :class:`GMNResult` with the optimal witness ``W``.
+    use_symmetry : bool
+        If ``rho`` is a multi-qubit state commuting with the global parity
+        ``Z (x) ... (x) Z`` (as in Ising and many spin models), restrict the SDP
+        to the two parity sectors, which makes it several times cheaper.
     """
     rho, dims = _validate(rho, dims)
     D = rho.shape[0]
@@ -109,16 +125,36 @@ def gmn(
     if real:
         rho = rho.real
 
-    def var():
-        return cp.Variable((D, D), symmetric=True) if real else cp.Variable((D, D), hermitian=True)
+    sectors = _parity_sectors(rho) if use_symmetry else None
+    if sectors is None:
+        sectors = [np.arange(D)]
 
-    W = var()
+    def var_n(n):
+        return cp.Variable((n, n), symmetric=True) if real else cp.Variable((n, n), hermitian=True)
+
+    def block_var():
+        # A variable commuting with the parity symmetry, i.e. block diagonal in
+        # the parity sectors. Twirling over the symmetry keeps a witness
+        # feasible and optimal, so this restriction loses nothing.
+        if len(sectors) == 1:
+            return var_n(D)
+        n0 = len(sectors[0])
+        full = cp.bmat(
+            [[var_n(n0), np.zeros((n0, D - n0))], [np.zeros((D - n0, n0)), var_n(D - n0)]]
+        )
+        inv = np.argsort(np.concatenate(sectors))
+        return full[inv, :][:, inv]
+
+    def psd(X):
+        return [X[sec, :][:, sec] >> 0 for sec in sectors] if len(sectors) > 1 else [X >> 0]
+
+    W = block_var()
     eye = np.eye(D)
     constraints = []
     for M in bipartitions(len(dims)):
-        P = var()
+        P = block_var()
         Q = _cp_partial_transpose(W - P, M, dims)
-        constraints += [P >> 0, Q >> 0, eye - Q >> 0]
+        constraints += psd(P) + psd(Q) + psd(eye - Q)
     objective = cp.trace(rho @ W) if real else cp.real(cp.trace(rho @ W))
     prob = cp.Problem(cp.Minimize(objective), constraints)
     if solver is None:

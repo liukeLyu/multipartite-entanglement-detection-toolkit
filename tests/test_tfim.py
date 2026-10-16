@@ -43,3 +43,11 @@ def test_translation_invariance_and_high_temperature():
 def test_invalid_sites():
     with pytest.raises(ValueError):
         tfim_rdm(1.0, [0, 0])
+
+
+@pytest.mark.slow
+def test_six_spin_gmn_matches_published_value():
+    # Three adjacent pairs at h = 0.99, Lyu et al., PRL 137, 110204 (2026), Fig. 3 data.
+    from medt import gmn
+
+    assert gmn(tfim_rdm(0.99, range(6)), (4, 4, 4)) == pytest.approx(0.1315414, abs=1e-5)
