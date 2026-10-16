@@ -2,7 +2,7 @@
 
 from medt import fermions, states, tfim
 from medt.bipartite import ccnr, is_ppt, log_negativity
-from medt.concurrence import gmc_lower_bound, gmc_pure, gmc_x_state
+from medt.concurrence import gmc_convex_roof, gmc_lower_bound, gmc_pure, gmc_x_state
 from medt.gmn import fermionic_gmn, gmn, negativity
 from medt.linalg import partial_trace, partial_transpose, permute_subsystems, realign
 from medt.network import gilbert_criterion, ring_inflation_robustness
@@ -21,6 +21,7 @@ __all__ = [
     "tfim",
     "ccnr",
     "fermionic_gmn",
+    "gmc_convex_roof",
     "gmc_lower_bound",
     "gmc_pure",
     "gmc_x_state",

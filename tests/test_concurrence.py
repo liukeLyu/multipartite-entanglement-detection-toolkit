@@ -48,3 +48,24 @@ def test_i2_bound_zero_for_biseparable():
     bell[np.ix_([0, 3], [0, 3])] = 0.5
     rho = np.kron(bell, np.eye(2) / 2)
     assert gmc_lower_bound(rho, seed=0) == 0
+
+
+def test_convex_roof_of_pure_state():
+    from medt import gmc_convex_roof
+
+    assert gmc_convex_roof(w_state(3), seed=0) == pytest.approx(np.sqrt(8 / 9), abs=1e-6)
+
+
+@pytest.mark.parametrize("p", [0.5, 0.8])
+def test_convex_roof_matches_x_state_formula(p):
+    from medt import gmc_convex_roof
+
+    rho = noisy_ghz(p)
+    assert gmc_convex_roof(rho, seed=0) == pytest.approx(gmc_x_state(rho), abs=1e-5)
+
+
+def test_bounds_bracket_the_convex_roof():
+    from medt import gmc_convex_roof
+
+    rho = 0.8 * w_state(3) + 0.2 * np.eye(8) / 8
+    assert gmc_lower_bound(rho, seed=0) <= gmc_convex_roof(rho, seed=0) + 1e-8

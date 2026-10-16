@@ -93,24 +93,36 @@ def gmn(
     solver : str, optional
         Any CVXPY SDP solver (``"CLARABEL"``, ``"SCS"``, ``"MOSEK"``, ...).
         By default, the interior-point solver Clarabel is used up to total
-        dimension 32 and the first-order solver SCS (``eps=1e-8``) above it:
-        interior-point memory grows too fast beyond five qubits.
+        dimension 32 (64 for real ``rho``) and the first-order solver SCS
+        (``eps=1e-8``) above it, since interior-point memory grows quickly.
+        SCS can converge slowly for nearly pure states; MOSEK, if installed,
+        is the most robust choice.
     return_witness : bool
         If True, return a :class:`GMNResult` with the optimal witness ``W``.
     """
     rho, dims = _validate(rho, dims)
     D = rho.shape[0]
-    W = cp.Variable((D, D), hermitian=True)
+    # For real rho, averaging a witness with its complex conjugate keeps it
+    # optimal and feasible (partial transposition commutes with conjugation),
+    # so real symmetric variables suffice. This halves the SDP size.
+    real = bool(np.abs(rho.imag).max() < 1e-12)
+    if real:
+        rho = rho.real
+
+    def var():
+        return cp.Variable((D, D), symmetric=True) if real else cp.Variable((D, D), hermitian=True)
+
+    W = var()
     eye = np.eye(D)
     constraints = []
     for M in bipartitions(len(dims)):
-        P = cp.Variable((D, D), hermitian=True)
+        P = var()
         Q = _cp_partial_transpose(W - P, M, dims)
         constraints += [P >> 0, Q >> 0, eye - Q >> 0]
-    objective = cp.real(cp.trace(rho @ W))
+    objective = cp.trace(rho @ W) if real else cp.real(cp.trace(rho @ W))
     prob = cp.Problem(cp.Minimize(objective), constraints)
     if solver is None:
-        solver = "CLARABEL" if D <= 32 else "SCS"
+        solver = "CLARABEL" if D <= (64 if real else 32) else "SCS"
         if solver == "SCS":
             solver_kwargs.setdefault("eps", 1e-8)
     prob.solve(solver=solver, **solver_kwargs)
