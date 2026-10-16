@@ -12,6 +12,7 @@ from medt.polytope import (
     polytope_separable,
     polytope_separable_all_cuts,
 )
+from medt.rains import gmre
 from medt.separability import kampermann_sep
 
 __all__ = [
@@ -25,6 +26,7 @@ __all__ = [
     "gmc_x_state",
     "gilbert_criterion",
     "gmn",
+    "gmre",
     "is_ppt",
     "kampermann_sep",
     "log_negativity",

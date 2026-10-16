@@ -13,7 +13,8 @@ authors = [{ name = "Liuke Lyu" }]
 dependencies = ["numpy>=1.24", "scipy>=1.10", "cvxpy>=1.4"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "ruff>=0.5"]
+rains = ["picos>=2.4", "qics>=1.0"]
+dev = ["pytest>=7", "ruff>=0.5", "picos>=2.4", "qics>=1.0"]
 
 [tool.pytest.ini_options]
 markers = ["slow: takes about a minute (run with -m slow)"]
