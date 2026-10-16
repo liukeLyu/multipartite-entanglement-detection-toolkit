@@ -4,28 +4,9 @@ import numpy as np
 import pytest
 
 from entdetect import gmn, negativity
+from tests.states import ghz, ket_to_rho, w_state
 
 DATA = Path(__file__).parent / "data"
-
-
-def ket_to_rho(psi):
-    psi = np.asarray(psi, dtype=complex)
-    psi /= np.linalg.norm(psi)
-    return np.outer(psi, psi.conj())
-
-
-def ghz(n):
-    psi = np.zeros(2**n)
-    psi[0] = psi[-1] = 1
-    return ket_to_rho(psi)
-
-
-def w_state(n):
-    psi = np.zeros(2**n)
-    for k in range(n):
-        psi[1 << k] = 1
-    return ket_to_rho(psi)
-
 
 def test_two_qubits_equals_negativity():
     rho = 0.7 * ket_to_rho([1, 0, 0, 1]) + 0.3 * np.eye(4) / 4

@@ -48,3 +48,25 @@ def bipartitions(n: int) -> list[tuple[int, ...]]:
     The last subsystem is never in M, which picks one representative per pair.
     """
     return [tuple(k for k in range(n) if m >> k & 1) for m in range(1, 2 ** (n - 1))]
+
+
+def partial_trace(rho: np.ndarray, keep: Sequence[int], dims: Sequence[int]) -> np.ndarray:
+    """Reduced state on the subsystems ``keep``, in the order given."""
+    rho = np.asarray(rho)
+    dims = _check_dims(rho, dims)
+    n = len(dims)
+    keep = list(keep)
+    traced = [k for k in range(n) if k not in keep]
+    t = rho.reshape(dims + dims)
+    # Move kept row indices, then traced row indices, then the same for columns.
+    t = t.transpose(keep + traced + [n + k for k in keep] + [n + k for k in traced])
+    dk = int(np.prod([dims[k] for k in keep]))
+    dt = int(np.prod([dims[k] for k in traced]))
+    return np.einsum("ajbj->ab", t.reshape(dk, dt, dk, dt))
+
+
+def realign(rho: np.ndarray, dims: Sequence[int]) -> np.ndarray:
+    """Realigned matrix ``R[(i,j),(k,l)] = rho[(i,k),(j,l)]`` of a bipartite operator."""
+    rho = np.asarray(rho)
+    dA, dB = _check_dims(rho, dims)
+    return rho.reshape(dA, dB, dA, dB).transpose(0, 2, 1, 3).reshape(dA * dA, dB * dB)
