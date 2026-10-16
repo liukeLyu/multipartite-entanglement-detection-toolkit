@@ -14,6 +14,8 @@ medt.gmc_x_state(rho)             # exact genuine multipartite concurrence (X st
 medt.ring_inflation_robustness(rho, [2, 2, 2])   # < 1 certifies network entanglement too
 ```
 
+For a guided tour with explanations and plots, see [`examples/medt_tour.ipynb`](examples/medt_tour.ipynb). It covers GME detection on noisy GHZ states, concurrence bounds, entanglement in the Ising chain, network entanglement, and reduced states of a 20-spin Lanczos ground state, and runs in a few minutes.
+
 ## Install
 
 MEDT needs Python 3.10 or newer. Clone the repository and install it into a fresh environment:
@@ -24,6 +26,7 @@ cd multipartite-entanglement-detection-toolkit
 python -m venv .venv && source .venv/bin/activate
 pip install .                # core: numpy, scipy, cvxpy (with the Clarabel and SCS solvers)
 pip install ".[rains]"       # optional: PICOS + QICS, needed only for gmre
+pip install ".[examples]"    # optional: Jupyter and matplotlib for the tour notebook
 ```
 
 ## Usage
@@ -131,7 +134,7 @@ Numbers refer to the References section. "Method" is where the criterion was int
 | Network entanglement: ring inflation, level 2 (symmetry reduced) and level 3 | `ring_inflation_robustness` | [12, 15] | [15] |
 | Network entanglement: Gilbert criterion | `gilbert_criterion` | [10, 15] | [15] |
 | Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic | `keep_systems`, `partial_trace`, `medt.fermions.fermionic_keep_systems`, `fermionic_partial_trace` | | |
-| Transverse-field Ising reduced states | `medt.tfim.tfim_rdm` | [21, 22, 23] | [14, 15] |
+| Transverse-field Ising chain: exact reduced states of the infinite chain; Lanczos ground state of a finite ring | `medt.tfim.tfim_rdm`, `medt.tfim.tfim_ground_state` | [21, 22, 23] | [14, 15] |
 
 Benchmark states live in `medt.states` (GHZ, W, Dicke, Werner, isotropic), and `medt.tfim.tfim_rdm(h, sites, beta)` gives exact reduced states of the infinite transverse-field Ising chain for any set of sites at zero or finite temperature.
 

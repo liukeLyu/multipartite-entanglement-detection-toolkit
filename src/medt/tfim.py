@@ -48,6 +48,43 @@ def tfim_rdm(h: float, sites: Sequence[int], beta: float | None = None) -> np.nd
     return rho / 2 ** len(sites)
 
 
+def tfim_ground_state(L: int, h: float, *, periodic: bool = True, tol: float = 1e-10) -> tuple[float, np.ndarray]:
+    """Ground state of ``H = -sum_i X_i X_{i+1} - h sum_i Z_i`` on ``L`` spins by Lanczos.
+
+    The Hamiltonian is applied matrix-free with bit operations, so memory is a
+    few vectors of length ``2^L`` (``L = 20`` needs well under 1 GB). Returns
+    ``(energy, psi)`` with ``psi`` a real ket whose site 0 is the most
+    significant bit, ready for :func:`medt.linalg.keep_systems`. For ``h < 1``
+    the two lowest states of a finite chain are split by a gap that closes
+    exponentially in ``L``; Lanczos then returns the lower, parity-even one.
+    """
+    from scipy.sparse.linalg import LinearOperator, eigsh
+
+    L = int(L)
+    if L < 2:
+        raise ValueError("need at least two spins")
+    idx = np.arange(2**L, dtype=np.int64)
+    # Diagonal: -h sum_i Z_i, with Z = +1 on |0>.
+    n_up = np.zeros(2**L)
+    for i in range(L):
+        n_up += (idx >> (L - 1 - i)) & 1
+    diag = -float(h) * (L - 2 * n_up)
+    bonds = [(i, i + 1) for i in range(L - 1)] + ([(L - 1, 0)] if periodic and L > 2 else [])
+    flips = [idx ^ ((1 << (L - 1 - i)) | (1 << (L - 1 - j))) for i, j in bonds]
+
+    def matvec(v):
+        v = np.ravel(v)
+        out = diag * v
+        for f in flips:
+            out -= v[f]
+        return out
+
+    H = LinearOperator((2**L, 2**L), matvec=matvec, dtype=float)
+    energy, vec = eigsh(H, k=1, which="SA", tol=tol)
+    psi = vec[:, 0]
+    return float(energy[0]), psi / np.linalg.norm(psi)
+
+
 def _pfaffian(A: np.ndarray) -> complex:
     """Pfaffian of a skew-symmetric matrix by Parlett-Reid style elimination."""
     A = np.array(A, dtype=complex)

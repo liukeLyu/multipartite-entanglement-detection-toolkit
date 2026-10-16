@@ -3,11 +3,16 @@ import pytest
 import scipy.sparse as sp
 import scipy.sparse.linalg as sla
 
-from medt.tfim import tfim_rdm
+from medt.tfim import tfim_ground_state, tfim_rdm
 
 
 def ring_ground_state_rdm(L, h, keep):
-    """Reduced state of the first ``keep`` sites of H = -sum X X - h sum Z on a ring."""
+    """Reduced state of the first ``keep`` sites of the ring ground state."""
+    psi = tfim_ground_state(L, h)[1].reshape(2**keep, -1)
+    return psi @ psi.conj().T
+
+
+def dense_ring_hamiltonian(L, h):
     eye, X, Z = sp.identity(2), sp.csr_matrix([[0, 1], [1, 0]]), sp.csr_matrix([[1.0, 0], [0, -1]])
 
     def op(o, i):
@@ -16,9 +21,27 @@ def ring_ground_state_rdm(L, h, keep):
             out = sp.kron(out, o if j == i else eye, format="csr")
         return out
 
-    H = sum(-op(X, i) @ op(X, (i + 1) % L) - h * op(Z, i) for i in range(L))
-    psi = sla.eigsh(H, k=1, which="SA")[1][:, 0].reshape(2**keep, -1)
-    return psi @ psi.conj().T
+    return sum(-op(X, i) @ op(X, (i + 1) % L) - h * op(Z, i) for i in range(L))
+
+
+@pytest.mark.parametrize("h", [0.3, 1.0, 2.5])
+def test_lanczos_matches_sparse_matrix_and_free_fermions(h):
+    L = 10
+    energy, psi = tfim_ground_state(L, h)
+    H = dense_ring_hamiltonian(L, h)
+    assert energy == pytest.approx(sla.eigsh(H, k=1, which="SA")[0][0], abs=1e-8)
+    assert np.linalg.norm(H @ psi - energy * psi) < 1e-6
+    # Parity-even sector: fermion momenta k = pi (2m + 1) / L, single-particle energies 2 sqrt(1 + h^2 - 2 h cos k).
+    k = np.pi * (2 * np.arange(L) + 1) / L
+    assert energy == pytest.approx(-np.sum(np.sqrt(1 + h**2 - 2 * h * np.cos(k))), abs=1e-8)
+
+
+def test_open_chain():
+    energy, _ = tfim_ground_state(8, 0.7, periodic=False)
+    H = dense_ring_hamiltonian(8, 0.7)
+    X = sp.csr_matrix([[0, 1], [1, 0]])
+    wrap = sp.kron(sp.kron(X, sp.identity(2**6)), X)  # X_0 X_7 bond
+    assert energy == pytest.approx(sla.eigsh(H + wrap, k=1, which="SA")[0][0], abs=1e-8)
 
 
 @pytest.mark.parametrize("h", [0.5, 2.0])
