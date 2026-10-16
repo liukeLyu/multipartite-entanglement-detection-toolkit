@@ -243,7 +243,7 @@ def _move_to_front_signs(index, keep, traced, modes):
 
 
 def fermionic_reduced_state(state, keep, n_modes=None):
-    """Reduced density matrix of the fermionic modes ``keep`` (in increasing order).
+    """Reduced density matrix of the fermionic modes ``keep``, in the order given.
 
     ``state`` is a ket or density matrix in the occupation basis of ``n_modes``
     modes, with the Jordan-Wigner ordering of :mod:`medt.fermions`; a ket can
@@ -251,8 +251,25 @@ def fermionic_reduced_state(state, keep, n_modes=None):
     moving the kept modes in front of the traced ones, after which the reduced
     state is an ordinary partial trace (:func:`medt.linalg.partial_trace`). The
     signs are computed in a vectorized pass over the nonzero amplitudes, so a
-    ket of 24 modes is handled without forming a density matrix.
+    ket of 24 modes is handled without forming a density matrix. If ``keep`` is
+    not increasing, the kept modes are then reordered with
+    :func:`fermionic_permute_systems`.
+
+    The result is defined by ``Tr(rho_A O) = Tr(rho O')`` for every operator
+    ``O`` built from the Majorana operators of the kept modes, where ``O'`` is
+    the same product of the corresponding Majoranas of the full system.
     """
+    order = [int(k) for k in keep]
+    if len(set(order)) != len(order):
+        raise ValueError("keep has repeated modes")
+    rdm = _fermionic_reduced_sorted(state, order, n_modes)
+    ranked = sorted(order)
+    if order == ranked:
+        return rdm
+    return fermionic_permute_systems(rdm, [ranked.index(k) for k in order])
+
+
+def _fermionic_reduced_sorted(state, keep, n_modes):
     from scipy import sparse
 
     from medt.linalg import partial_trace

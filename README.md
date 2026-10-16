@@ -92,7 +92,7 @@ sigma = np.diag([0.5, 0, 0, 0, 0, 0, 0, 0.5])             # any known network st
 medt.gilbert_criterion(ket_to_dm(ghz(3)), sigma)          # noise above which rho is a network state
 ```
 
-Reduced states of large systems. `partial_trace` takes a ket or a density matrix, dense or SciPy sparse, and never builds the full density matrix of a ket, so a dense 24-qubit ket reduces to a few sites in about a second. `medt.fermions.fermionic_reduced_state` does the same for fermionic modes, including the signs from reordering modes.
+Reduced states of large systems. `partial_trace` takes a ket or a density matrix, dense or SciPy sparse, and never builds the full density matrix of a ket, so a dense 24-qubit ket reduces to a few sites in about a second. `medt.fermions.fermionic_reduced_state` does the same for fermionic modes, including the signs from reordering modes. Both return the kept subsystems in the order listed in `keep`; `permute_subsystems` and `medt.fermions.fermionic_permute_systems` reorder a state on their own.
 
 ```python
 from scipy import sparse
@@ -130,7 +130,7 @@ Numbers refer to the References section. "Method" is where the criterion was int
 | Adaptive polytopes: separable, fully separable, biseparable | `polytope_*` | [11] | |
 | Network entanglement: ring inflation, level 2 (symmetry reduced) and level 3 | `ring_inflation_robustness` | [12, 15] | [15] |
 | Network entanglement: Gilbert criterion | `gilbert_criterion` | [10, 15] | [15] |
-| Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic | `partial_trace`, `medt.fermions.fermionic_reduced_state` | [24] | |
+| Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic | `partial_trace`, `medt.fermions.fermionic_reduced_state` | | |
 | Transverse-field Ising reduced states | `medt.tfim.tfim_rdm` | [21, 22, 23] | [14, 15] |
 
 Benchmark states live in `medt.states` (GHZ, W, Dicke, Werner, isotropic), and `medt.tfim.tfim_rdm(h, sites, beta)` gives exact reduced states of the infinite transverse-field Ising chain for any set of sites at zero or finite temperature.
@@ -185,7 +185,6 @@ The Python snippets in this README run as part of the test suite.
 21. E. Lieb, T. Schultz, D. Mattis, "Two soluble models of an antiferromagnetic chain", Ann. Phys. 16, 407 (1961).
 22. P. Pfeuty, "The one-dimensional Ising model with a transverse field", Ann. Phys. 57, 79 (1970).
 23. M. Fagotti, F. H. L. Essler, "Reduced density matrix after a quantum quench", Phys. Rev. B 87, 245107 (2013), arXiv:1302.6944.
-24. N. Johnston, "QETLAB: A MATLAB toolbox for quantum entanglement", version 0.9, https://qetlab.com (2016), doi:10.5281/zenodo.44637. MEDT follows its subsystem conventions; the code is a separate implementation.
 
 The 1961 and 1970 papers predate arXiv.
 

@@ -16,7 +16,7 @@ from medt.fermions import (
     random_fermionic_density_matrix,
     random_mixed_fermionic_state,
 )
-from medt.linalg import partial_transpose
+from medt.linalg import partial_transpose, permute_subsystems
 
 I = np.eye(2, dtype=complex)
 X = np.array([[0, 1], [1, 0]], dtype=complex)
@@ -596,3 +596,60 @@ def test_fermionic_reduced_state_of_24_modes():
     small = fermionic_reduced_state(_fock_ket(TERMS, 5), [0, 3])
     big = fermionic_reduced_state(_fock_ket(TERMS, 24, as_sparse=True), [0, 3])
     assert np.allclose(big, small)
+
+
+def _monomial(majoranas, subset, size):
+    op = np.eye(size, dtype=complex)
+    for j in subset:
+        op = op @ majoranas[j]
+    return op
+
+
+def _check_defining_property(rho_full, rdm, keep, modes):
+    """Tr(rho_A O) == Tr(rho O') for every Majorana monomial O on the kept modes."""
+    import itertools
+
+    full = jordan_wigner_majoranas(modes)
+    red = jordan_wigner_majoranas(len(keep))
+    full_index = [2 * k + s for k in keep for s in (0, 1)]  # reduced Majorana j -> full Majorana
+    for r in range(2 * len(keep) + 1):
+        for subset in itertools.combinations(range(2 * len(keep)), r):
+            lhs = np.trace(rdm @ _monomial(red, subset, 2 ** len(keep)))
+            rhs = np.trace(rho_full @ _monomial(full, [full_index[j] for j in subset], 2**modes))
+            assert lhs == pytest.approx(rhs, abs=1e-10), subset
+
+
+@pytest.mark.parametrize("keep", [[0, 2], [3, 1], [4, 0, 2], [2, 4, 1, 3], [1]])
+def test_fermionic_reduced_state_reproduces_all_majorana_expectations(keep):
+    modes = 5
+    rho = random_fermionic_density_matrix(modes, seed=7)
+    _check_defining_property(rho, fermionic_reduced_state(rho, keep), keep, modes)
+    psi = _fock_ket(TERMS, modes)
+    _check_defining_property(np.outer(psi, psi.conj()), fermionic_reduced_state(psi, keep), keep, modes)
+
+
+def test_fermionic_reduced_state_of_gaussian_state():
+    # A thermal free-fermion state: reduced states must reproduce all its correlations.
+    modes = 4
+    rng = np.random.default_rng(3)
+    A = rng.normal(size=(2 * modes, 2 * modes))
+    rho = fermionic_gaussian_thermal_state(A - A.T, beta=0.8)
+    for keep in ([0, 3], [2, 0], [3, 1, 2]):
+        _check_defining_property(rho, fermionic_reduced_state(rho, keep), keep, modes)
+
+
+def test_fermionic_reduced_state_composes():
+    # Tracing out modes in two steps agrees with tracing them out at once, for any order.
+    rho = random_fermionic_density_matrix(5, seed=11)
+    direct = fermionic_reduced_state(rho, [4, 1])
+    step = fermionic_reduced_state(fermionic_reduced_state(rho, [1, 3, 4]), [2, 0])
+    assert np.allclose(direct, step)
+
+
+def test_fermionic_reduced_state_reordering_is_signed_permutation():
+    rho = random_fermionic_density_matrix(5, seed=5)
+    sorted_rdm = fermionic_reduced_state(rho, [0, 2, 4])
+    assert np.allclose(fermionic_reduced_state(rho, [4, 0, 2]), fermionic_permute_systems(sorted_rdm, [2, 0, 1]))
+    # Naive (unsigned) reordering differs, so the test is sensitive to the signs.
+    naive = permute_subsystems(sorted_rdm, [2, 0, 1], [2, 2, 2])
+    assert not np.allclose(fermionic_reduced_state(rho, [4, 0, 2]), naive)

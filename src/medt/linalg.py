@@ -1,14 +1,8 @@
 """Tensor-product helpers for states and density matrices.
 
 Subsystems are ordered as in ``np.kron(A_1, A_2, ..., A_n)``: subsystem 0 is the
-most significant index, the same ordering as QETLAB's ``PartialTrace``,
-``PartialTranspose`` and ``PermuteSystems`` [1]. Subsystem labels are 0-based,
-and :func:`partial_trace` takes the subsystems to keep rather than the ones to
-trace out. The implementations are written for NumPy and SciPy and do not
-reuse QETLAB code.
-
-[1] N. Johnston, "QETLAB: A MATLAB toolbox for quantum entanglement",
-    version 0.9, https://qetlab.com (2016), doi:10.5281/zenodo.44637.
+most significant index. Subsystem labels are 0-based, and :func:`partial_trace`
+takes the subsystems to keep rather than the ones to trace out.
 """
 
 from __future__ import annotations
