@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from entdetect import gmn, negativity
+from medt import gmn, negativity
 from tests.states import ghz, ket_to_rho, w_state
 
 DATA = Path(__file__).parent / "data"

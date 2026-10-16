@@ -27,7 +27,7 @@ from dataclasses import dataclass
 import cvxpy as cp
 import numpy as np
 
-from entdetect.linalg import bipartitions, partial_transpose
+from medt.linalg import bipartitions, partial_transpose
 
 
 @dataclass
@@ -89,7 +89,7 @@ def gmn(
     dims : sequence of int, optional
         Local dimensions of the parties. Defaults to qubits. To treat a block
         of qubits as one party, group them (e.g. six qubits as ``(4, 4, 4)``)
-        after reordering with :func:`entdetect.permute_subsystems` if needed.
+        after reordering with :func:`medt.permute_subsystems` if needed.
     solver : str, optional
         Any CVXPY SDP solver (``"CLARABEL"``, ``"SCS"``, ``"MOSEK"``, ...).
         By default, the interior-point solver Clarabel is used up to total
@@ -142,11 +142,11 @@ def fermionic_gmn(
     """Fermionic genuine multiparticle negativity of a state of ``n_modes`` modes.
 
     The PPT-mixture SDP of :func:`gmn` with each partial transpose replaced by
-    the fermionic partial transpose of :mod:`entdetect.fermions`, following
+    the fermionic partial transpose of :mod:`medt.fermions`, following
     Allen and Witczak-Krempa, arXiv:2509.12109. Each party is one fermionic
     mode. For two modes it equals the fermionic negativity.
     """
-    from entdetect.fermions import compute_fermionic_partial_transpose_matrix
+    from medt.fermions import compute_fermionic_partial_transpose_matrix
 
     rho = np.asarray(rho, dtype=complex)
     D = rho.shape[0]

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from entdetect.fermions import (
+from medt.fermions import (
     compute_fermionic_partial_transpose_matrix,
     fermionic_gaussian_thermal_state,
     fermionic_log_negativity,
@@ -14,7 +14,7 @@ from entdetect.fermions import (
     random_fermionic_density_matrix,
     random_mixed_fermionic_state,
 )
-from entdetect.linalg import partial_transpose
+from medt.linalg import partial_transpose
 
 I = np.eye(2, dtype=complex)
 X = np.array([[0, 1], [1, 0]], dtype=complex)

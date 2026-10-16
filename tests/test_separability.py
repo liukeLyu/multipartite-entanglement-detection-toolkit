@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from entdetect import is_ppt, kampermann_sep
-from entdetect.separability import max_product_overlap
+from medt import is_ppt, kampermann_sep
+from medt.separability import max_product_overlap
 from tests.states import ket_to_rho
 
 

@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-from entdetect import fermionic_gmn
-from entdetect.fermions import fermionic_negativity
+from medt import fermionic_gmn
+from medt.fermions import fermionic_negativity
 
 pytestmark = pytest.mark.filterwarnings("ignore:Solution may be inaccurate:UserWarning")
 

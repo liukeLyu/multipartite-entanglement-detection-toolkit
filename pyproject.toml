@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "entdetect"
+name = "medt"
 version = "0.1.0.dev0"
-description = "Detect and quantify multipartite entanglement in quantum states"
+description = "Multipartite Entanglement Detection Toolkit: certify and quantify entanglement in quantum states"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

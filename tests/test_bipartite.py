@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from entdetect import ccnr, is_ppt, log_negativity, partial_trace, realign
+from medt import ccnr, is_ppt, log_negativity, partial_trace, realign
 from tests.states import horodecki_3x3, ket_to_rho
 
 

@@ -6,7 +6,7 @@ from collections.abc import Sequence
 
 import numpy as np
 
-from entdetect.linalg import partial_transpose, realign
+from medt.linalg import partial_transpose, realign
 
 
 def log_negativity(rho: np.ndarray, sys: Sequence[int], dims: Sequence[int]) -> float:

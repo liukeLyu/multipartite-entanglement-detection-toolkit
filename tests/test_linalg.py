@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from entdetect.linalg import bipartitions, partial_transpose, permute_subsystems
+from medt.linalg import bipartitions, partial_transpose, permute_subsystems
 
 
 def rand_mat(d, rng):

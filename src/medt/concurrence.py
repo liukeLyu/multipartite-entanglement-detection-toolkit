@@ -18,7 +18,7 @@ from collections.abc import Sequence
 import numpy as np
 from scipy.optimize import minimize
 
-from entdetect.linalg import bipartitions, partial_trace
+from medt.linalg import bipartitions, partial_trace
 
 
 def gmc_pure(psi: np.ndarray, dims: Sequence[int] | None = None) -> float:

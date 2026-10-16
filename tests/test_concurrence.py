@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from entdetect import gmc_lower_bound, gmc_pure, gmc_x_state
+from medt import gmc_lower_bound, gmc_pure, gmc_x_state
 from tests.states import ghz, w_state
 
 
