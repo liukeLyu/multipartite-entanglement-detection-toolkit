@@ -4,6 +4,7 @@ from entdetect.bipartite import ccnr, is_ppt, log_negativity
 from entdetect.concurrence import gmc_lower_bound, gmc_pure, gmc_x_state
 from entdetect.gmn import gmn, negativity
 from entdetect.linalg import partial_trace, partial_transpose, permute_subsystems, realign
+from entdetect.separability import kampermann_sep
 
 __all__ = [
     "ccnr",
@@ -12,6 +13,7 @@ __all__ = [
     "gmc_x_state",
     "gmn",
     "is_ppt",
+    "kampermann_sep",
     "log_negativity",
     "negativity",
     "partial_trace",
