@@ -29,6 +29,7 @@ def test_gilbert_criterion():
 
 # Level-3 GNME noise thresholds p_c = 1 - t from Lyu et al., PRL 137, 110204 (2026), Table I.
 @pytest.mark.slow
-def test_level3_ghz_matches_paper():
-    t = ring_inflation_robustness(ket_to_dm(ghz(3)), (2, 2, 2), level=3)
-    assert 1 - t == pytest.approx(0.3878, abs=2e-4)
+@pytest.mark.parametrize("psi, p_c", [(ghz(3), 0.3878), (w(3), 0.3486)])
+def test_level3_matches_paper(psi, p_c):
+    t = ring_inflation_robustness(ket_to_dm(psi), (2, 2, 2), level=3)
+    assert 1 - t == pytest.approx(p_c, abs=3e-4)

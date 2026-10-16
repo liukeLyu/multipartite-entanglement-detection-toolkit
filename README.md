@@ -141,8 +141,9 @@ Each public function has tests against analytic results: GHZ and W states, noisy
 
 - GMN of reduced states of the Kitaev honeycomb model [13] to 1e-8 (3 sites in the fast suite, a 6-site hexagon in the slow suite).
 - GMN of 6 adjacent spins of the critical transverse-field Ising chain [15] (slow suite).
-- Ring-inflation robustness of GHZ and W states [15]: level 2 against the MOSEK values of the paper's code, and level 3 for GHZ (noise threshold 0.3878, Table I; slow suite).
+- Ring-inflation robustness of GHZ and W states [15]: level 2 against the MOSEK values of the paper's code, and level 3 for GHZ and W (noise thresholds 0.3878 and 0.3486, Table I; slow suite).
 - TFIM reduced states against exact diagonalization of a 16-site ring.
+- GMRE of 3- and 4-spin TFIM reduced states against the reference MATLAB values (agreement within 5e-6 bits).
 - Fermionic negativity and partial transpose identities from [4, 5].
 
 The Python snippets in this README run as part of the test suite.
