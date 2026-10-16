@@ -16,7 +16,7 @@ Pairs of subsystems of dimensions 2x2 or 2x3 can be freed together under a
 PPT constraint, since PPT equals separability there [1].
 
 [1] T. Ohst, X.-D. Yu, O. Gühne, G. Sarbicki, "Certifying quantum separability
-    with adaptive polytopes", arXiv:2210.10054.
+    with adaptive polytopes", SciPost Phys. 16, 063 (2024), arXiv:2210.10054.
 """
 
 from __future__ import annotations

@@ -18,7 +18,8 @@ nine parties) gives tighter bounds at a higher cost.
 
 [1] M. Navascués, E. Wolfe, D. Rosset, A. Pozas-Kerstjens, PRL 125, 240505
     (2020), arXiv:2002.02773.
-[2] L. Lyu et al., PRL 137, 110204 (2026), arXiv:2512.11118.
+[2] L. Lyu, P. Lauand, W. Witczak-Krempa, "Network-irreducible multiparty
+    entanglement in quantum matter", PRL 137, 110204 (2026), arXiv:2512.11118.
 """
 
 from __future__ import annotations

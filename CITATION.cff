@@ -1,0 +1,70 @@
+cff-version: 1.2.0
+message: "If you use MEDT, please cite the software and the papers for the methods you use (see README, Methods)."
+title: "Multipartite Entanglement Detection Toolkit (MEDT)"
+type: software
+authors:
+  - family-names: Lyu
+    given-names: Liuke
+license: MIT
+version: 0.1.0.dev0
+keywords:
+  - quantum entanglement
+  - genuine multipartite entanglement
+  - network entanglement
+  - semidefinite programming
+references:
+  - type: article
+    title: "Network-irreducible multiparty entanglement in quantum matter"
+    authors:
+      - {family-names: Lyu, given-names: Liuke}
+      - {family-names: Lauand, given-names: Pedro}
+      - {family-names: Witczak-Krempa, given-names: William}
+    journal: "Physical Review Letters"
+    volume: 137
+    start: 110204
+    year: 2026
+    identifiers:
+      - {type: other, value: "arXiv:2512.11118"}
+  - type: article
+    title: "Fermionic genuine multiparty entanglement"
+    authors:
+      - {family-names: Allen, given-names: J.}
+      - {family-names: Lyu, given-names: Liuke}
+      - {family-names: Witczak-Krempa, given-names: William}
+    year: 2026
+    identifiers:
+      - {type: other, value: "arXiv:2607.20707"}
+  - type: conference-paper
+    title: "Genuine multipartite Rains entanglement"
+    authors:
+      - {family-names: Murray, given-names: H. S.}
+      - {family-names: Bhattacharya, given-names: S.}
+      - {family-names: Cerezo, given-names: M.}
+      - {family-names: Lyu, given-names: Liuke}
+      - {family-names: Wilde, given-names: M. M.}
+    conference: {name: "IEEE International Symposium on Information Theory (ISIT)"}
+    year: 2026
+    doi: 10.1109/ISIT62367.2026.11653617
+  - type: article
+    title: "Multiparty entanglement microscopy of quantum Ising models in 1d, 2d and 3d"
+    authors:
+      - {family-names: Lyu, given-names: Liuke}
+      - {family-names: Song, given-names: M.}
+      - {family-names: Wang, given-names: T.-T.}
+      - {family-names: Meng, given-names: Z. Y.}
+      - {family-names: Witczak-Krempa, given-names: William}
+    year: 2024
+    identifiers:
+      - {type: other, value: "arXiv:2412.12533"}
+  - type: article
+    title: "Multiparty entanglement loops in quantum spin liquids"
+    authors:
+      - {family-names: Lyu, given-names: Liuke}
+      - {family-names: Chandorkar, given-names: D.}
+      - {family-names: Kapoor, given-names: S.}
+      - {family-names: Takei, given-names: S.}
+      - {family-names: Sørensen, given-names: E. S.}
+      - {family-names: Witczak-Krempa, given-names: William}
+    year: 2025
+    identifiers:
+      - {type: other, value: "arXiv:2505.18124"}

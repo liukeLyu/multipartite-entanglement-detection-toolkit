@@ -1,4 +1,9 @@
-"""Bipartite entanglement criteria."""
+"""Bipartite entanglement criteria.
+
+[1] A. Peres, PRL 77, 1413 (1996).
+[2] M. Horodecki, P. Horodecki, R. Horodecki, Phys. Lett. A 223, 1 (1996).
+[3] G. Vidal, R. F. Werner, PRA 65, 032314 (2002).
+"""
 
 from __future__ import annotations
 
@@ -10,13 +15,13 @@ from medt.linalg import partial_transpose, realign
 
 
 def log_negativity(rho: np.ndarray, sys: Sequence[int], dims: Sequence[int]) -> float:
-    """Logarithmic negativity ``log2 ||rho^{T_sys}||_1``."""
+    """Logarithmic negativity ``log2 ||rho^{T_sys}||_1`` [3]."""
     eig = np.linalg.eigvalsh(partial_transpose(rho, sys, dims))
     return float(np.log2(np.abs(eig).sum()))
 
 
 def is_ppt(rho: np.ndarray, sys: Sequence[int], dims: Sequence[int], tol: float = 1e-10) -> bool:
-    """Whether ``rho`` has a positive partial transpose on ``sys``."""
+    """Whether ``rho`` has a positive partial transpose on ``sys`` [1, 2]."""
     return bool(np.linalg.eigvalsh(partial_transpose(rho, sys, dims)).min() >= -tol)
 
 
