@@ -165,29 +165,29 @@ The Python snippets in this README run as part of the test suite.
 
 ## References
 
-1. B. Jungnitsch, T. Moroder, O. Gühne, "Taming multiparticle entanglement", Phys. Rev. Lett. 106, 190502 (2011), arXiv:1010.6049.
-2. M. Hofmann, T. Moroder, O. Gühne, "Analytical characterization of the genuine multiparticle negativity", J. Phys. A 47, 155301 (2014), arXiv:1401.2424.
-3. J. Allen, L. Lyu, W. Witczak-Krempa, "Fermionic genuine multiparty entanglement", arXiv:2607.20707 (2026).
-4. H. Shapourian, K. Shiozaki, S. Ryu, "Partial time-reversal transformation and entanglement negativity in fermionic systems", Phys. Rev. B 95, 165101 (2017), arXiv:1611.07536.
-5. H. Shapourian, S. Ryu, "Entanglement negativity of fermions: monotonicity, separability criterion, and classification of few-mode states", Phys. Rev. A 99, 022310 (2019), arXiv:1804.08637.
-6. H. S. Murray, S. Bhattacharya, M. Cerezo, L. Lyu, M. M. Wilde, "Genuine multipartite Rains entanglement", IEEE ISIT 2026, doi:10.1109/ISIT62367.2026.11653617, arXiv:2601.09590.
-7. Z.-H. Ma, Z.-H. Chen, J.-L. Chen, C. Spengler, A. Gabriel, M. Huber, "Measure of genuine multipartite entanglement with computable lower bounds", Phys. Rev. A 83, 062325 (2011), arXiv:1101.2001.
-8. S. M. Hashemi Rafsanjani, M. Huber, C. J. Broadbent, J. H. Eberly, "Genuinely multipartite concurrence of N-qubit X matrices", Phys. Rev. A 86, 062303 (2012), arXiv:1208.2706.
-9. H. Kampermann, O. Gühne, C. Wilmott, D. Bruß, "Algorithm for characterizing stochastic local operations and classical communication classes of multiparticle entanglement", Phys. Rev. A 86, 032307 (2012), arXiv:1203.5872.
-10. L. Gurvits, H. Barnum, "Largest separable balls around the maximally mixed bipartite quantum state", Phys. Rev. A 66, 062311 (2002), arXiv:quant-ph/0204159.
-11. T. Ohst, X.-D. Yu, O. Gühne, G. Sarbicki, "Certifying quantum separability with adaptive polytopes", SciPost Phys. 16, 063 (2024), arXiv:2210.10054.
-12. M. Navascués, E. Wolfe, D. Rosset, A. Pozas-Kerstjens, "Genuine network multipartite entanglement", Phys. Rev. Lett. 125, 240505 (2020), arXiv:2002.02773.
-13. L. Lyu, D. Chandorkar, S. Kapoor, S. Takei, E. S. Sørensen, W. Witczak-Krempa, "Multiparty entanglement loops in quantum spin liquids", Nat. Commun. (2026), doi:10.1038/s41467-026-71113-8, arXiv:2505.18124.
-14. L. Lyu, M. Song, T.-T. Wang, Z. Y. Meng, W. Witczak-Krempa, "Multiparty entanglement microscopy of quantum Ising models in one, two, and three dimensions", Phys. Rev. B 111, 245108 (2025), arXiv:2412.12533.
-15. L. Lyu, P. Lauand, W. Witczak-Krempa, "Network-irreducible multiparty entanglement in quantum matter", Phys. Rev. Lett. 137, 110204 (2026), arXiv:2512.11118.
-16. A. Peres, "Separability criterion for density matrices", Phys. Rev. Lett. 77, 1413 (1996), arXiv:quant-ph/9604005.
-17. M. Horodecki, P. Horodecki, R. Horodecki, "Separability of mixed states: necessary and sufficient conditions", Phys. Lett. A 223, 1 (1996), arXiv:quant-ph/9605038.
-18. G. Vidal, R. F. Werner, "Computable measure of entanglement", Phys. Rev. A 65, 032314 (2002), arXiv:quant-ph/0102117.
-19. O. Rudolph, "Further results on the cross norm criterion for separability", Quantum Inf. Process. 4, 219 (2005), arXiv:quant-ph/0202121.
-20. K. Chen, L.-A. Wu, "A matrix realignment method for recognizing entanglement", Quantum Inf. Comput. 3, 193 (2003), arXiv:quant-ph/0205017.
+1. B. Jungnitsch, T. Moroder, O. Gühne, "Taming multiparticle entanglement", Phys. Rev. Lett. 106, 190502 (2011), [arXiv:1010.6049](https://arxiv.org/abs/1010.6049).
+2. M. Hofmann, T. Moroder, O. Gühne, "Analytical characterization of the genuine multiparticle negativity", J. Phys. A 47, 155301 (2014), [arXiv:1401.2424](https://arxiv.org/abs/1401.2424).
+3. J. Allen, L. Lyu, W. Witczak-Krempa, "Fermionic genuine multiparty entanglement", [arXiv:2607.20707](https://arxiv.org/abs/2607.20707) (2026).
+4. H. Shapourian, K. Shiozaki, S. Ryu, "Partial time-reversal transformation and entanglement negativity in fermionic systems", Phys. Rev. B 95, 165101 (2017), [arXiv:1611.07536](https://arxiv.org/abs/1611.07536).
+5. H. Shapourian, S. Ryu, "Entanglement negativity of fermions: monotonicity, separability criterion, and classification of few-mode states", Phys. Rev. A 99, 022310 (2019), [arXiv:1804.08637](https://arxiv.org/abs/1804.08637).
+6. H. S. Murray, S. Bhattacharya, M. Cerezo, L. Lyu, M. M. Wilde, "Genuine multipartite Rains entanglement", IEEE ISIT 2026, [doi:10.1109/ISIT62367.2026.11653617](https://doi.org/10.1109/ISIT62367.2026.11653617), [arXiv:2601.09590](https://arxiv.org/abs/2601.09590).
+7. Z.-H. Ma, Z.-H. Chen, J.-L. Chen, C. Spengler, A. Gabriel, M. Huber, "Measure of genuine multipartite entanglement with computable lower bounds", Phys. Rev. A 83, 062325 (2011), [arXiv:1101.2001](https://arxiv.org/abs/1101.2001).
+8. S. M. Hashemi Rafsanjani, M. Huber, C. J. Broadbent, J. H. Eberly, "Genuinely multipartite concurrence of N-qubit X matrices", Phys. Rev. A 86, 062303 (2012), [arXiv:1208.2706](https://arxiv.org/abs/1208.2706).
+9. H. Kampermann, O. Gühne, C. Wilmott, D. Bruß, "Algorithm for characterizing stochastic local operations and classical communication classes of multiparticle entanglement", Phys. Rev. A 86, 032307 (2012), [arXiv:1203.5872](https://arxiv.org/abs/1203.5872).
+10. L. Gurvits, H. Barnum, "Largest separable balls around the maximally mixed bipartite quantum state", Phys. Rev. A 66, 062311 (2002), [arXiv:quant-ph/0204159](https://arxiv.org/abs/quant-ph/0204159).
+11. T. Ohst, X.-D. Yu, O. Gühne, G. Sarbicki, "Certifying quantum separability with adaptive polytopes", SciPost Phys. 16, 063 (2024), [arXiv:2210.10054](https://arxiv.org/abs/2210.10054).
+12. M. Navascués, E. Wolfe, D. Rosset, A. Pozas-Kerstjens, "Genuine network multipartite entanglement", Phys. Rev. Lett. 125, 240505 (2020), [arXiv:2002.02773](https://arxiv.org/abs/2002.02773).
+13. L. Lyu, D. Chandorkar, S. Kapoor, S. Takei, E. S. Sørensen, W. Witczak-Krempa, "Multiparty entanglement loops in quantum spin liquids", Nat. Commun. (2026), [doi:10.1038/s41467-026-71113-8](https://doi.org/10.1038/s41467-026-71113-8), [arXiv:2505.18124](https://arxiv.org/abs/2505.18124).
+14. L. Lyu, M. Song, T.-T. Wang, Z. Y. Meng, W. Witczak-Krempa, "Multiparty entanglement microscopy of quantum Ising models in one, two, and three dimensions", Phys. Rev. B 111, 245108 (2025), [arXiv:2412.12533](https://arxiv.org/abs/2412.12533).
+15. L. Lyu, P. Lauand, W. Witczak-Krempa, "Network-irreducible multiparty entanglement in quantum matter", Phys. Rev. Lett. 137, 110204 (2026), [arXiv:2512.11118](https://arxiv.org/abs/2512.11118).
+16. A. Peres, "Separability criterion for density matrices", Phys. Rev. Lett. 77, 1413 (1996), [arXiv:quant-ph/9604005](https://arxiv.org/abs/quant-ph/9604005).
+17. M. Horodecki, P. Horodecki, R. Horodecki, "Separability of mixed states: necessary and sufficient conditions", Phys. Lett. A 223, 1 (1996), [arXiv:quant-ph/9605038](https://arxiv.org/abs/quant-ph/9605038).
+18. G. Vidal, R. F. Werner, "Computable measure of entanglement", Phys. Rev. A 65, 032314 (2002), [arXiv:quant-ph/0102117](https://arxiv.org/abs/quant-ph/0102117).
+19. O. Rudolph, "Further results on the cross norm criterion for separability", Quantum Inf. Process. 4, 219 (2005), [arXiv:quant-ph/0202121](https://arxiv.org/abs/quant-ph/0202121).
+20. K. Chen, L.-A. Wu, "A matrix realignment method for recognizing entanglement", Quantum Inf. Comput. 3, 193 (2003), [arXiv:quant-ph/0205017](https://arxiv.org/abs/quant-ph/0205017).
 21. E. Lieb, T. Schultz, D. Mattis, "Two soluble models of an antiferromagnetic chain", Ann. Phys. 16, 407 (1961).
 22. P. Pfeuty, "The one-dimensional Ising model with a transverse field", Ann. Phys. 57, 79 (1970).
-23. M. Fagotti, F. H. L. Essler, "Reduced density matrix after a quantum quench", Phys. Rev. B 87, 245107 (2013), arXiv:1302.6944.
+23. M. Fagotti, F. H. L. Essler, "Reduced density matrix after a quantum quench", Phys. Rev. B 87, 245107 (2013), [arXiv:1302.6944](https://arxiv.org/abs/1302.6944).
 
 The 1961 and 1970 papers predate arXiv.
 
