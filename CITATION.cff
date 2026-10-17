@@ -14,6 +14,14 @@ keywords:
   - network entanglement
   - semidefinite programming
 references:
+  - type: thesis
+    title: "Multipartite entanglement in quantum matter"
+    authors:
+      - {family-names: Lyu, given-names: Liuke}
+    thesis-type: "PhD thesis"
+    institution: {name: "Université de Montréal"}
+    year: 2026
+    doi: 10.71781/34784
   - type: article
     title: "Network-irreducible multiparty entanglement in quantum matter"
     authors:

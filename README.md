@@ -16,6 +16,10 @@ medt.ring_inflation_robustness(rho, [2, 2, 2])   # < 1 certifies network entangl
 
 For a guided tour with explanations and plots, see [`examples/medt_tour.ipynb`](examples/medt_tour.ipynb). It covers bipartite negativity, GME detection on noisy GHZ states, concurrence bounds, entanglement in the Ising chain, network entanglement, and entanglement microscopy of a 20-spin Lanczos ground state, and runs in a few minutes. [`examples/medt_fermions.ipynb`](examples/medt_fermions.ipynb) explains what changes for fermions (exchange signs, parity conservation) and compares fermionic and bosonic negativity and GMN; it runs in under a minute.
 
+## Background
+
+MEDT grew out of the author's PhD thesis, *Multipartite entanglement in quantum matter* (Université de Montréal, 2026), [doi:10.71781/34784](https://doi.org/10.71781/34784). Only the abstract is in French, and its English version follows right after. The research articles that make up the thesis are in English. The thesis builds "entanglement microscopy", which takes reduced density matrices from large-scale numerics and tests them with certified entanglement diagnostics. Its parts line up with the toolkit like this: Ising criticality [14] uses `negativity`, `gmn`, `gmc_*` and `medt.tfim`; quantum spin liquids [13] and beyond-Landau criticality [24] use `gmn`; and genuine network multipartite entanglement [15] uses `ring_inflation_robustness` and `gilbert_criterion`.
+
 ## Install
 
 MEDT needs Python 3.10 or newer. Clone the repository and install it into a fresh environment:
@@ -190,6 +194,7 @@ The Python snippets in this README run as part of the test suite.
 21. E. Lieb, T. Schultz, D. Mattis, "Two soluble models of an antiferromagnetic chain", Ann. Phys. 16, 407 (1961).
 22. P. Pfeuty, "The one-dimensional Ising model with a transverse field", Ann. Phys. 57, 79 (1970).
 23. M. Fagotti, F. H. L. Essler, "Reduced density matrix after a quantum quench", Phys. Rev. B 87, 245107 (2013), [arXiv:1302.6944](https://arxiv.org/abs/1302.6944).
+24. M. Song, T.-T. Wang, L. Lyu, W. Witczak-Krempa, Z. Y. Meng, "Entanglement architecture of beyond-Landau quantum criticality", [arXiv:2509.09983](https://arxiv.org/abs/2509.09983) (2025).
 
 The 1961 and 1970 papers predate arXiv.
 
