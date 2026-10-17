@@ -5,6 +5,7 @@ type: software
 authors:
   - family-names: Lyu
     given-names: Liuke
+repository-code: "https://github.com/liukeLyu/multipartite-entanglement-detection-toolkit"
 license: MIT
 version: 0.1.0.dev0
 keywords:
