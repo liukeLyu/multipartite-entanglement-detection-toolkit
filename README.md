@@ -14,7 +14,7 @@ medt.gmc_x_state(rho)             # exact genuine multipartite concurrence (X st
 medt.ring_inflation_robustness(rho, [2, 2, 2])   # < 1 certifies network entanglement too
 ```
 
-For a guided tour with explanations and plots, see [`examples/medt_tour.ipynb`](examples/medt_tour.ipynb). It covers GME detection on noisy GHZ states, concurrence bounds, entanglement in the Ising chain, network entanglement, and reduced states of a 20-spin Lanczos ground state, and runs in a few minutes.
+For a guided tour with explanations and plots, see [`examples/medt_tour.ipynb`](examples/medt_tour.ipynb). It covers bipartite negativity, GME detection on noisy GHZ states, concurrence bounds, entanglement in the Ising chain, network entanglement, and entanglement microscopy of a 20-spin Lanczos ground state, and runs in a few minutes. [`examples/medt_fermions.ipynb`](examples/medt_fermions.ipynb) explains what changes for fermions (exchange signs, parity conservation) and compares fermionic and bosonic negativity and GMN; it runs in under a minute.
 
 ## Install
 
@@ -147,7 +147,7 @@ SDPs go through [CVXPY](https://www.cvxpy.org), so any installed solver works (`
 ```bash
 pip install -e ".[dev]"
 pytest              # fast suite, a few minutes
-pytest -m slow      # slow checks (~20 min): 6-qubit GMN, level-3 inflation, the tour notebook
+pytest -m slow      # slow checks (~20 min): 6-qubit GMN, level-3 inflation, the example notebooks
 ```
 
 ## Validation
