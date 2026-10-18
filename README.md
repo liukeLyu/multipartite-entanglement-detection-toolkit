@@ -1,5 +1,7 @@
 # Multipartite Entanglement Detection Toolkit (MEDT)
 
+*Why I built this.* A lot has been written about multipartite entanglement, but the tools to detect and measure it are scattered across many papers, each with its own conventions and code. I wanted to bring them together in one framework, make them easy to use, and show that they are new and interesting probes of many-body physics.
+
 Python tools to certify and quantify entanglement in multipartite quantum states, from small benchmark states to reduced density matrices of many-body systems.
 
 ```python
