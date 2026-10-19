@@ -208,4 +208,4 @@ If you use MEDT, please cite the papers for the methods you use (Methods table a
 
 MIT, see `LICENSE`.
 
-If this project helped you, you can [sponsor me on GitHub](https://github.com/sponsors/liukeLyu) ♥
+If this project helped you, you can [sponsor me on GitHub](https://github.com/sponsors/liukeLyu) or on [爱发电 Afdian](https://afdian.com/a/liukelyu) ♥
