@@ -16,6 +16,24 @@ medt.gmc_x_state(rho)             # exact genuine multipartite concurrence (X st
 medt.ring_inflation_robustness(rho, [2, 2, 2])   # < 1 certifies network entanglement too
 ```
 
+Sweeping the noise shows how much of it genuine multipartite entanglement (GME) survives. The GMN of the GHZ state drops linearly and is zero beyond 4/7 noise; the W state loses it a little earlier.
+
+<p align="center"><img src="docs/figures/gmn_vs_noise.png" width="560" alt="GMN of noisy GHZ and W states versus the white-noise fraction p"></p>
+
+The same tools apply to many-body systems. Take three neighbouring spins A, B, C of the infinite transverse-field Ising chain in thermal equilibrium at temperature T. `medt.tfim` gives their exact reduced density matrix, and the GMN tells whether the three spins are still genuinely entangled with each other:
+
+```python
+for T in (0.2, 0.5, 1.0):
+    rho_abc = medt.tfim.tfim_rdm(1.0, [0, 1, 2], beta=1 / T)   # critical field h = 1
+    print(T, medt.gmn(rho_abc))                                # 0.081, 0.036, 0
+```
+
+Heat washes out the GME, and it does not fade away slowly: it vanishes at a finite temperature, a "sudden death" whose temperature depends on the field h.
+
+<p align="center"><img src="docs/figures/gmn_vs_temperature.png" width="580" alt="Diagram of the Ising chain with three adjacent spins highlighted, and their GMN versus temperature for four fields"></p>
+
+[`docs/figures/make_readme_figures.py`](docs/figures/make_readme_figures.py) makes both figures in about 20 seconds.
+
 For a guided tour with explanations and plots, see [`examples/medt_tour.ipynb`](examples/medt_tour.ipynb). It covers bipartite negativity, GME detection on noisy GHZ states, concurrence bounds, entanglement in the Ising chain, network entanglement, and entanglement microscopy of a 20-spin Lanczos ground state, and runs in a few minutes. [`examples/medt_fermions.ipynb`](examples/medt_fermions.ipynb) explains what changes for fermions (exchange signs, parity conservation) and compares fermionic and bosonic negativity and GMN; it runs in under a minute.
 
 ## Background
