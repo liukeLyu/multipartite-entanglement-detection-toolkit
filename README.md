@@ -160,6 +160,7 @@ Numbers refer to the References section. "Method" is where the criterion was int
 | Network entanglement: ring inflation, level 2 (symmetry reduced) and level 3                                    | `ring_inflation_robustness`                                                                              | [12, 15]     | [15]         |
 | Network entanglement: Gilbert criterion                                                                         | `gilbert_criterion`                                                                                      | [10, 15]     | [15]         |
 | Reduced states of kets and density matrices, dense or sparse, bosonic or fermionic                              | `keep_systems`, `partial_trace`, `medt.fermions.fermionic_keep_systems`, `fermionic_partial_trace` |              |              |
+| Mixed qubit stabilizer states: exact log negativity, entanglement across a cut, GME, reduced states (GF(2) algebra) | `stabilizer_log_negativity`, `stabilizer_negativity`, `stabilizer_entangled`, `stabilizer_is_gme`, `stabilizer_restrict` | [25, 26, 27, 28, 29] |              |
 | Transverse-field Ising chain: exact reduced states of the infinite chain; Lanczos ground state of a finite ring | `medt.tfim.tfim_rdm`, `medt.tfim.tfim_ground_state`                                                    | [21, 22, 23] | [14, 15]     |
 
 Benchmark states live in `medt.states` (GHZ, W, Dicke, Werner, isotropic), and `medt.tfim.tfim_rdm(h, sites, beta)` gives exact reduced states of the infinite transverse-field Ising chain for any set of sites at zero or finite temperature.
@@ -186,6 +187,7 @@ Each public function has tests against analytic results: GHZ and W states, noisy
 - TFIM reduced states against exact diagonalization of a 16-site ring.
 - GMRE of 3- and 4-spin TFIM reduced states against the reference MATLAB values (agreement within 5e-6 bits).
 - Fermionic negativity and partial transpose identities from [4, 5].
+- Stabilizer negativity against dense partial transposes for GHZ, cluster, code and random Clifford states, pure and mixed, on every cut up to 7 qubits, and for toric-code regions.
 
 The Python snippets in this README run as part of the test suite.
 
@@ -215,6 +217,11 @@ The Python snippets in this README run as part of the test suite.
 22. P. Pfeuty, "The one-dimensional Ising model with a transverse field", Ann. Phys. 57, 79 (1970).
 23. M. Fagotti, F. H. L. Essler, "Reduced density matrix after a quantum quench", Phys. Rev. B 87, 245107 (2013), [arXiv:1302.6944](https://arxiv.org/abs/1302.6944).
 24. M. Song, T.-T. Wang, L. Lyu, W. Witczak-Krempa, Z. Y. Meng, "Entanglement architecture of beyond-Landau quantum criticality", [arXiv:2509.09983](https://arxiv.org/abs/2509.09983) (2025).
+25. K. M. R. Audenaert, M. B. Plenio, "Entanglement on mixed stabilizer states: normal forms and reduction procedures", New J. Phys. 7, 170 (2005), [doi:10.1088/1367-2630/7/1/170](https://doi.org/10.1088/1367-2630/7/1/170), [arXiv:quant-ph/0505036](https://arxiv.org/abs/quant-ph/0505036).
+26. B. Shi, X. Dai, Y.-M. Lu, "Entanglement negativity at the critical point of measurement-driven transition", [arXiv:2012.00040](https://arxiv.org/abs/2012.00040) (2020).
+27. S. Sang, Y. Li, T. Zhou, X. Chen, T. H. Hsieh, M. P. A. Fisher, "Entanglement negativity at measurement-induced criticality", PRX Quantum 2, 030313 (2021), [doi:10.1103/PRXQuantum.2.030313](https://doi.org/10.1103/PRXQuantum.2.030313), [arXiv:2012.00031](https://arxiv.org/abs/2012.00031).
+28. O. Makuta, B. Kuzaka, R. Augusiak, "Fully non-positive-partial-transpose genuinely entangled subspaces", Quantum 7, 915 (2023), [doi:10.22331/q-2023-02-09-915](https://doi.org/10.22331/q-2023-02-09-915), [arXiv:2203.16902](https://arxiv.org/abs/2203.16902).
+29. A. Hamma, R. Ionicioiu, P. Zanardi, "Bipartite entanglement and entropic boundary law in lattice spin systems", Phys. Rev. A 71, 022315 (2005), [doi:10.1103/PhysRevA.71.022315](https://doi.org/10.1103/PhysRevA.71.022315), [arXiv:quant-ph/0409073](https://arxiv.org/abs/quant-ph/0409073).
 
 The 1961 and 1970 papers predate arXiv.
 
