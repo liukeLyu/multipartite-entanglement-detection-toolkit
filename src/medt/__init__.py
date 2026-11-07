@@ -14,6 +14,14 @@ from medt.polytope import (
 )
 from medt.rains import gmre
 from medt.separability import kampermann_sep
+from medt.stabilizer import (
+    stabilizer_dm,
+    stabilizer_entangled,
+    stabilizer_is_gme,
+    stabilizer_log_negativity,
+    stabilizer_negativity,
+    stabilizer_restrict,
+)
 
 __all__ = [
     "fermions",
@@ -42,5 +50,11 @@ __all__ = [
     "polytope_separable_all_cuts",
     "realign",
     "ring_inflation_robustness",
+    "stabilizer_dm",
+    "stabilizer_entangled",
+    "stabilizer_is_gme",
+    "stabilizer_log_negativity",
+    "stabilizer_negativity",
+    "stabilizer_restrict",
 ]
 __version__ = "0.1.0.dev0"
