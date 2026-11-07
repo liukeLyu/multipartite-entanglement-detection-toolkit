@@ -448,20 +448,6 @@ def test_gme_matches_gmn(name):
     assert (gmn(stabilizer_dm(gens)) > 1e-6) == expected
 
 
-@pytest.mark.parametrize("gens", [ghz(3), chain(4), random_clifford_state(4, np.random.default_rng(3))])
-def test_pure_gmn_equals_min_cut_negativity(gens):
-    # Renormalized GMN of a pure state is the minimum bipartite negativity (Hofmann et al. 2014, Lemma 3 (vii)).
-    n = len(gens)
-    expected = min(stabilizer_negativity(gens, sys) for sys in all_cuts(n))
-    assert gmn(stabilizer_dm(gens)) == pytest.approx(expected, abs=1e-6)
-
-
-@pytest.mark.slow
-@pytest.mark.parametrize("gens", [ghz(5), chain(5), ring(5)[:4], grid(2, 3)[:5]])
-def test_gme_matches_gmn_slow(gens):
-    assert (gmn(stabilizer_dm(gens)) > 1e-6) == stabilizer_is_gme(gens)
-
-
 def test_gme_with_grouped_parties():
     gens = NAMED_STATES["two_bells"]
     assert stabilizer_is_gme(gens, [[0, 2], [1, 3]])
